@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Some of these algorithms are all rather literally from Knuth - as a
+    Some of these algorithms are taken rather literally from Knuth - as a
     consequence they're not very Pythonic, and not terribly readable.
 
     In some cases I've modified the algorithm to make sure that all items are
@@ -52,36 +52,6 @@ class Canvas:
         self.surface.write_to_png(fname)
             
 
-class Sortable:
-    def __init__(self, i):
-        self.i = i
-        self.path = []
-
-    def __cmp__(self, other):
-        return cmp(self.i, other.i)
-
-    def __repr__(self):
-        return str(self.i)
-
-
-class TrackList:
-    def __init__(self, itms, wrapper=None):
-        self.lst = [Sortable(i) for i in itms]
-        if wrapper:
-            self.lst = [wrapper(i) for i in self.lst]
-        self.start = self.lst[:]
-
-    def reset(self):
-        self.lst = self.start[:]
-
-    def __getattr__(self, attr):
-        return getattr(self.lst, attr)
-    
-    def memoizePath(self):
-        for i, v in enumerate(self):
-            v.path.append(i)
-    
-
 class PathDrawer:
     def __init__(self, width, height, line, border, highlights, prefix):
         self.width, self.height = width, height
@@ -123,16 +93,51 @@ class PathDrawer:
         ctx.set_font_size(20)
         ctx.set_source_rgb(0.3, 0.3, 0.3)
         ctx.move_to(5, self.height + 20)
-        ctx.text_path(algo.name)
+        ctx.text_path(algo.name + "      " + "%s comparisons"%algo.comparisons)
         ctx.fill()
         c.save("%s%s.png"%(self.prefix, algo.name))
 
 
+class Sortable:
+    comparisons = 0
+    def __init__(self, i):
+        self.i = i
+        self.path = []
+
+    def __cmp__(self, other):
+        Sortable.comparisons += 1
+        return cmp(self.i, other.i)
+
+    def __repr__(self):
+        return str(self.i)
+
+
+class TrackList:
+    def __init__(self, itms, wrapper=None):
+        self.lst = [Sortable(i) for i in itms]
+        if wrapper:
+            self.lst = [wrapper(i) for i in self.lst]
+        self.start = self.lst[:]
+
+    def reset(self):
+        Sortable.comparisons = 0
+        self.lst = self.start[:]
+
+    def __getattr__(self, attr):
+        return getattr(self.lst, attr)
+    
+    def memoizePath(self):
+        for i, v in enumerate(self):
+            v.path.append(i)
+    
+
 class Algorithm:
     def __init__(self, entries):
         self.lst = self.makeList(entries)
+        self.lst.reset()
         self.lst.memoizePath()
         self.sort(self.lst)
+        self.comparisons = Sortable.comparisons
     
     def makeList(self, entries):
         return TrackList(entries)
@@ -302,8 +307,8 @@ class Quick(Algorithm):
             if l < right:
                 self.sort(lst, l, right)
 
-algorithms = [Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell]
 
+algorithms = [Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell]
 
 def main():
     usage = "usage: %prog [options]"
@@ -404,7 +409,6 @@ def main():
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
     for i in algorithms:
-        name = i.__name__
         if options.algorithm:
             if not i.name in selected:
                 continue
