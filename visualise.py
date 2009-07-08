@@ -101,7 +101,7 @@ class PathDrawer:
         return lst
 
     def draw(self, algo):
-        c = Canvas(self.width, self.height)
+        c = Canvas(self.width, self.height + 25)
         # Clearer when drawn in this order
         l = reversed(algo.lst)
         ctx = c.ctx()
@@ -118,12 +118,18 @@ class PathDrawer:
             ctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
             ctx.set_line_width(self.line)
             ctx.stroke_border(self.border)
+
+        ctx.select_font_face("Sans")
+        ctx.set_font_size(20)
+        ctx.set_source_rgb(0.3, 0.3, 0.3)
+        ctx.move_to(5, self.height + 20)
+        ctx.text_path(algo.name)
+        ctx.fill()
         c.save("%s%s.png"%(self.prefix, algo.name))
 
 
 class Algorithm:
     def __init__(self, entries):
-        self.name = self.__class__.__name__
         self.lst = self.makeList(entries)
         self.lst.memoizePath()
         self.sort(self.lst)
@@ -152,6 +158,7 @@ class TimWrapper:
     
 
 class Tim(Algorithm):
+    name = "timsort"
     def makeList(self, entries):
         return TrackList(entries, TimWrapper)
 
@@ -173,6 +180,7 @@ class Tim(Algorithm):
 
 
 class Bubble(Algorithm):
+    name = "bubblesort"
     def sort(self, lst):
         bound = len(lst)-1
         while 1:
@@ -191,6 +199,7 @@ class ListInsertion(Algorithm):
     """
         Broadly based on the list insertion sort on p 97.  
     """
+    name = "insertionsort"
     def sort(self, lst):
         for i in range(1, len(lst)):
             for j in range(i):
@@ -204,6 +213,7 @@ class Shell(Algorithm):
     """
         Shell's method, p. 84
     """
+    name = "shellsort"
     def sort(self, lst):
         t = [5, 3, 1]
         for h in t:
@@ -226,6 +236,7 @@ class Selection(Algorithm):
     """
         Selection Sort, p. 139
     """
+    name = "selectionsort"
     def sort(self, lst):
         for j in range(len(lst)-1, 0, -1):
             m = lst.index(max(lst[:j]))  # No, this is not efficient ;)
@@ -237,6 +248,7 @@ class Heap(Algorithm):
     """
         Algorithm from http://en.wikipedia.org/wiki/Heapsort
     """
+    name = "heapsort"
     def sift(self, lst, start, count):
         root = start
         while (root * 2) + 1 < count:
@@ -267,6 +279,7 @@ class Quick(Algorithm):
     """
         http://www.cs.indiana.edu/classes/a348-dger/lectures/tsort/1.0.2/QSortAlgorithm.java
     """
+    name = "quicksort"
     def sort(self, lst, left=0, right=None):
         if right is None:
             right = len(lst) - 1
@@ -289,6 +302,7 @@ class Quick(Algorithm):
             if l < right:
                 self.sort(lst, l, right)
 
+algorithms = [Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell]
 
 
 def main():
@@ -297,9 +311,10 @@ def main():
     parser.add_option(
         "-a",
         dest="algorithm",
-        default=False,
+        default=[],
         type="choice",
-        choices=["quick", "heap", "selection", "insertion", "bubble", "shell", "tim"],
+        action="append",
+        choices=[i.name for i in algorithms],
         help="Draw only a named algorithm."
     )
     parser.add_option(
@@ -386,12 +401,13 @@ def main():
         options.highlight,
         options.prefix
     )
-    for i in [Quick, Heap, Selection, ListInsertion, Bubble, Shell, Tim]:
+    if options.algorithm:
+        selected = [i.lower() for i in options.algorithm]
+    for i in algorithms:
         name = i.__name__
         if options.algorithm:
-            if not options.algorithm.lower() == name.lower():
+            if not i.name in selected:
                 continue
-        print >> sys.stderr, name
         a = i(lst)
         ldrawer.draw(a)
 
