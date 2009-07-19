@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-    Some of these algorithms are taken rather literally from Knuth - as a
+   Some of these algorithms are taken rather literally from Knuth - as a
     consequence they're not very Pythonic, and not terribly readable.
 
     In some cases I've modified the algorithm to make sure that all items are
@@ -71,7 +71,7 @@ class PathDrawer:
         return lst
 
     def draw(self, algo):
-        c = Canvas(self.width, self.height + 25)
+        c = Canvas(self.width, self.height + 20)
         # Clearer when drawn in this order
         l = reversed(algo.lst)
         ctx = c.ctx()
@@ -90,10 +90,10 @@ class PathDrawer:
             ctx.stroke_border(self.border)
 
         ctx.select_font_face("Sans")
-        ctx.set_font_size(20)
+        ctx.set_font_size(15)
         ctx.set_source_rgb(0.3, 0.3, 0.3)
-        ctx.move_to(5, self.height + 20)
-        ctx.text_path(algo.name + "      " + "%s comparisons"%algo.comparisons)
+        ctx.move_to(5, self.height + 15)
+        ctx.text_path(algo.name + "      " + "[%s comparisons]"%algo.comparisons)
         ctx.fill()
         c.save("%s%s.png"%(self.prefix, algo.name))
 
@@ -351,14 +351,14 @@ def main():
         "-x",
         dest="width",
         type="int",
-        default=700,
+        default=None,
         help="Image width"
     )
     parser.add_option(
         "-y",
         dest="height",
         type="int",
-        default=300,
+        default=None,
         help="Image height"
     )
     parser.add_option(
@@ -398,6 +398,13 @@ def main():
     if options.dump:
         for i in lst:
             print i,
+
+    if not options.height:
+        options.height = (options.line + options.border + 5) * len(lst)
+
+    if not options.width:
+        options.width = int(options.height * 3)
+
     ldrawer = PathDrawer(
         options.width,
         options.height,
