@@ -53,10 +53,10 @@ class Canvas:
             
 
 class PathDrawer:
-    def __init__(self, width, height, line, border, highlights, prefix):
+    def __init__(self, width, height, line, border, highlights):
         self.width, self.height = width, height
         self.line, self.border = line, border
-        self.highlights, self.prefix = highlights, prefix
+        self.highlights = highlights
 
     def _lineCoords(self, elem, l):
         init = 0.02 # Proportional initial length 
@@ -70,7 +70,7 @@ class PathDrawer:
         lst.append((1, lst[-1][1]))
         return lst
 
-    def draw(self, algo):
+    def draw(self, algo, fname):
         c = Canvas(self.width, self.height + 20)
         # Clearer when drawn in this order
         l = reversed(algo.lst)
@@ -93,9 +93,12 @@ class PathDrawer:
         ctx.set_font_size(15)
         ctx.set_source_rgb(0.3, 0.3, 0.3)
         ctx.move_to(5, self.height + 15)
-        ctx.text_path(algo.name + "      " + "[%s comparisons]"%algo.comparisons)
+        # Don't put the number of comparisons in until we've revisited the algorithms
+        # to make sure the figures are sensible
+        # ctx.text_path(algo.name + "      " + "[%s comparisons]"%algo.comparisons)
+        ctx.text_path(algo.name)
         ctx.fill()
-        c.save("%s%s.png"%(self.prefix, algo.name))
+        c.save("%s.png"%fname)
 
 
 class Sortable:
@@ -143,6 +146,9 @@ class Algorithm:
         return TrackList(entries)
 
 
+# The TimSort stuff can be done more neatly, by inspecting the list from witin
+# the __cmp__ method. This way we can also perform the entire trick with only
+# one sort. Then again, I'm lazy, and this works. ;)
 class TimBreak(Exception): pass
 
 
@@ -335,9 +341,9 @@ def main():
         help="Read data from file"
     )
     parser.add_option(
-        "-p",
-        dest="prefix",
-        help="File name prefix.",
+        "-o",
+        dest="ofname",
+        help="Output file name. Only usable when a single algorithm is being drawn.",
         default=""
     )
     parser.add_option(
@@ -411,16 +417,19 @@ def main():
         options.line,
         options.border,
         options.highlight,
-        options.prefix
     )
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
-    for i in algorithms:
-        if options.algorithm:
-            if not i.name in selected:
-                continue
+
+    if options.algorithm:
+        todraw = [i for i in algorithms if i.name in options.algorithm]
+
+    if options.ofname and len(todraw) > 1:
+        parser.error("Cannot specify output file name when drawing more than one algorithm.")
+
+    for i in todraw:
         a = i(lst)
-        ldrawer.draw(a)
+        ldrawer.draw(a, options.ofname or a.name)
 
 
 if __name__ == "__main__":
