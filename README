@@ -1,0 +1,8 @@
+
+sortvis is a small script that uses Cairo to draw visualisations of sorting
+algorithms.
+
+See this blog post for more information:
+
+http://www.hatfulofhollow.com/posts/code/visualisingsorting/index.html
+
