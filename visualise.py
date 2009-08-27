@@ -48,8 +48,21 @@ class Canvas:
         c.fill()
         c.stroke()
 
-    def save(self, fname):
-        self.surface.write_to_png(fname)
+    def save(self, fname, vertical):
+        """
+            Save the image to a file. If vertical is true, rotate by 90 degrees.
+        """
+        if vertical:
+            surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.height, self.width)
+            ctx = cairo.Context(surf)
+            ctx.translate(self.height*0.5, self.width*0.5)
+            ctx.rotate(math.pi/2)
+            ctx.translate(-self.width*0.5, -self.height*0.5)
+            ctx.set_source_surface(self.surface)
+            ctx.paint()
+        else:
+            surf = self.surface
+        surf.write_to_png(fname)
             
 
 class PathDrawer:
@@ -70,7 +83,7 @@ class PathDrawer:
         lst.append((1, lst[-1][1]))
         return lst
 
-    def draw(self, algo, fname):
+    def draw(self, algo, fname, vertical=False):
         c = Canvas(self.width, self.height + 20)
         # Clearer when drawn in this order
         l = reversed(algo.lst)
@@ -98,7 +111,7 @@ class PathDrawer:
         # ctx.text_path(algo.name + "      " + "[%s comparisons]"%algo.comparisons)
         ctx.text_path(algo.name)
         ctx.fill()
-        c.save("%s.png"%fname)
+        c.save("%s.png"%fname, vertical)
 
 
 class Sortable:
@@ -382,6 +395,13 @@ def main():
         help="Border width"
     )
     parser.add_option(
+        "-r",
+        dest="rotate",
+        default=False,
+        action="store_true",
+        help="Rotate images 90 degrees"
+    )
+    parser.add_option(
         "-i",
         dest="highlight",
         type="int",
@@ -429,7 +449,7 @@ def main():
 
     for i in todraw:
         a = i(lst)
-        ldrawer.draw(a, options.ofname or a.name)
+        ldrawer.draw(a, options.ofname or a.name, options.rotate)
 
 
 if __name__ == "__main__":
