@@ -443,6 +443,8 @@ def main():
 
     if options.algorithm:
         todraw = [i for i in algorithms if i.name in options.algorithm]
+    else:
+        todraw = [i for i in algorithms]
 
     if options.ofname and len(todraw) > 1:
         parser.error("Cannot specify output file name when drawing more than one algorithm.")
