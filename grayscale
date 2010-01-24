@@ -109,11 +109,9 @@ def main():
     if not options.width:
         options.width = int(options.height * 3)
 
-    ldrawer = graph.PathDrawer(
+    ldrawer = graph.Grayscale(
         options.width,
         options.height,
-        options.line,
-        options.border,
     )
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
@@ -137,6 +135,8 @@ def main():
             sortd,
             a.name if options.title else None,
             options.ofname or (a.name+".png"),
+            options.line,
+            options.border,
             rotate = options.rotate,
         )
 

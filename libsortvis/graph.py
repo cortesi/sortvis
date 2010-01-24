@@ -1,5 +1,9 @@
 import cairo
 
+try:
+    import scurve
+except ImportError:
+    scurve = None
 
 def intRGB(r, g, b):
         return (r/255.0, g/255.0, b/255.0)
@@ -54,12 +58,8 @@ class Canvas:
         surf.write_to_png(fname)
             
 
-class PathDrawer:
+class _PathDrawer:
     TITLEGAP = 5
-    def __init__(self, width, height, line, border):
-        self.width, self.height = width, height
-        self.line, self.border = line, border
-
     def lineCoords(self, positions, length, edge=0.02):
         """
             Returns a list of proportional (x, y) co-ordinates for a given list
@@ -75,42 +75,104 @@ class PathDrawer:
         coords.append((1, v*yscale))
         return coords
 
-    def getColor(self, x, n):
-        """
-            Retrieve the color for item x out of n.
-        """
-        v = 1 - (float(x)/n*0.7)
-        return (v, v, v)
-
-    def drawPaths(self, canvas, width, height, lst):
+    def drawPaths(self, canvas, linewidth, borderwidth, width, height, lst):
         ctx = canvas.ctx()
         ctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
         ctx.set_line_cap(cairo.LINE_CAP_BUTT)
         ctx.set_line_join(cairo.LINE_JOIN_ROUND)
-        ctx.set_line_width(self.line)
+        ctx.set_line_width(linewidth)
         for elem in lst:
             for i in self.lineCoords(elem.path, len(lst)):
-                ctx.line_to(width * i[0], self.line + height * i[1])
+                ctx.line_to(width * i[0], linewidth + height * i[1])
             ctx.set_source_rgb(*self.getColor(elem.i, len(lst)))
-            ctx.stroke_border(self.border)
+            ctx.stroke_border(borderwidth)
 
-    def draw(self, lst, title, fname, titleHeight = 20, rotate = False):
+    def drawPixels(self, canvas, lst, unmoved):
+        ctx = canvas.ctx()
+        for elem in lst:
+            ctx.set_source_rgb(*self.getColor(elem.i, len(lst)))
+            moved = unmoved
+            for x, y in enumerate(elem.path):
+                if y != elem.path[0]:
+                    moved = True
+                if moved:
+                    ctx.rectangle(x, y, 1, 1)
+                    ctx.fill()
+
+    def drawTitle(self, canvas, title, xpos, ypos, size, font="Sans"):
+        ctx = canvas.ctx()
+        ctx.select_font_face(font)
+        ctx.set_font_size(size)
+        ctx.set_source_rgb(0.3, 0.3, 0.3)
+        ctx.move_to(xpos, ypos)
+        ctx.text_path(title)
+        ctx.fill()
+
+    def getColor(self, x, n):
+        """
+            Retrieve the color for item x out of n.
+        """
+        raise NotImplementedError
+
+
+class Grayscale(_PathDrawer):
+    def __init__(self, width, height, titleHeight=20):
+        self.width, self.height, self.titleHeight = width, height, titleHeight
+
+    def getColor(self, x, n):
+        v = 1 - (float(x)/n*0.7)
+        return (v, v, v)
+
+    def draw(self, lst, title, fname, linewidth, borderwidth, rotate=False):
         c = Canvas(self.width, self.height)
         # Clearer when drawn in this order
         lst.reverse()
         if title:
-            self.drawPaths(c, self.width, self.height-titleHeight, lst)
+            self.drawPaths(
+                c,
+                linewidth,
+                borderwidth,
+                self.width,
+                self.height-self.titleHeight,
+                lst
+            )
         else:
-            self.drawPaths(c, self.width, self.height, lst)
-
+            self.drawPaths(c, linewidth, borderwidth, self.width, self.height, lst)
         if title:
-            ctx = c.ctx()
-            ctx.select_font_face("Sans")
-            ctx.set_font_size(titleHeight-self.TITLEGAP)
-            ctx.set_source_rgb(0.3, 0.3, 0.3)
-            ctx.move_to(5, self.height - self.TITLEGAP)
-            ctx.text_path(title)
-            ctx.fill()
-
+            self.drawTitle(
+                c,
+                title,
+                5,
+                self.height-self.TITLEGAP,
+                self.titleHeight-self.TITLEGAP
+            )
         c.save(fname, rotate)
+
+
+if scurve:
+    class Weave(_PathDrawer):
+        def __init__(self, titleHeight=20):
+            self.titleHeight = titleHeight
+
+        def getColor(self, x, n):
+            csource = scurve.fromSize("hilbert", 3, n)
+            d = float(csource.dimensions()[0])
+            return [i/d for i in csource.point(x)]
+
+        def draw(self, lst, title, fname, unmoved):
+            height = len(lst)
+            width = len(lst[0].path)
+            c = Canvas(width, height + (self.titleHeight if title else 0))
+            # Clearer when drawn in this order
+            lst.reverse()
+            self.drawPixels(c, lst, unmoved)
+            if title:
+                self.drawTitle(
+                    c,
+                    title,
+                    5,
+                    height+self.titleHeight-self.TITLEGAP,
+                    self.titleHeight-self.TITLEGAP
+                )
+            c.save(fname, False)
 
