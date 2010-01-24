@@ -221,7 +221,8 @@ class Quick(Algorithm):
                     r -= 1
                 if l <= r:
                     lst[l], lst[r] = lst[r], lst[l]
-                    lst.log()
+                    if l != r:
+                        lst.log()
                     l+=1
                     r-=1
             if left < r:

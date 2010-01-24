@@ -84,6 +84,13 @@ def main():
         help="Rotate images 90 degrees"
     )
     parser.add_option(
+        "-t",
+        dest="title",
+        default=False,
+        action="store_true",
+        help="Add a title to image."
+    )
+    parser.add_option(
         "-i",
         dest="highlight",
         type="int",
@@ -138,7 +145,12 @@ def main():
             print a.name
             for i in sortd:
                 print i.path
-        ldrawer.draw(sortd, a.name, options.ofname or (a.name+".png"), options.rotate)
+        ldrawer.draw(
+            sortd,
+            a.name if options.title else None,
+            options.ofname or (a.name+".png"),
+            rotate = options.rotate,
+        )
 
 
 if __name__ == "__main__":
