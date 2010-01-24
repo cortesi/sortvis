@@ -90,14 +90,6 @@ def main():
         action="store_true",
         help="Add a title to image."
     )
-    parser.add_option(
-        "-i",
-        dest="highlight",
-        type="int",
-        default=[],
-        action="append",
-        help="Highlight digit N (0-based). Can be passed muiltiple times."
-    )
     options, args = parser.parse_args()
     if args:
         parser.error("Script takes no arguments.")
@@ -107,9 +99,6 @@ def main():
     else:
         lst = range(options.numelements)
         random.shuffle(lst)
-    if options.highlight:
-        if max(options.highlight) > (len(lst)-1):
-            parser.error("Highlight element > than list length.")
     if options.dump:
         for i in lst:
             print i,
@@ -125,7 +114,6 @@ def main():
         options.height,
         options.line,
         options.border,
-        options.highlight,
     )
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]

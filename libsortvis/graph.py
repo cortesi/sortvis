@@ -56,10 +56,9 @@ class Canvas:
 
 class PathDrawer:
     TITLEGAP = 5
-    def __init__(self, width, height, line, border, highlights):
+    def __init__(self, width, height, line, border):
         self.width, self.height = width, height
         self.line, self.border = line, border
-        self.highlights = highlights
 
     def lineCoords(self, positions, length, edge=0.02):
         """
@@ -84,12 +83,9 @@ class PathDrawer:
         ctx.set_line_width(self.line)
         for elem in lst:
             for i in self.lineCoords(elem.path, len(lst)):
-                ctx.line_to(self.width * i[0], self.line + self.height * i[1])
-            if self.highlights and elem.i in self.highlights:
-                ctx.set_source_rgb(*HIGHLIGHT)
-            else:
-                x = 1 - (float(elem.i)/len(lst)*0.7)
-                ctx.set_source_rgb(x, x, x)
+                ctx.line_to(width * i[0], self.line + height * i[1])
+            x = 1 - (float(elem.i)/len(lst)*0.7)
+            ctx.set_source_rgb(x, x, x)
             ctx.stroke_border(self.border)
 
     def draw(self, lst, title, fname, titleHeight = 20, rotate = False):
