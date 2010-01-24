@@ -75,6 +75,13 @@ class PathDrawer:
         coords.append((1, v*yscale))
         return coords
 
+    def getColor(self, x, n):
+        """
+            Retrieve the color for item x out of n.
+        """
+        v = 1 - (float(x)/n*0.7)
+        return (v, v, v)
+
     def drawPaths(self, canvas, width, height, lst):
         ctx = canvas.ctx()
         ctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
@@ -84,25 +91,24 @@ class PathDrawer:
         for elem in lst:
             for i in self.lineCoords(elem.path, len(lst)):
                 ctx.line_to(width * i[0], self.line + height * i[1])
-            x = 1 - (float(elem.i)/len(lst)*0.7)
-            ctx.set_source_rgb(x, x, x)
+            ctx.set_source_rgb(*self.getColor(elem.i, len(lst)))
             ctx.stroke_border(self.border)
 
     def draw(self, lst, title, fname, titleHeight = 20, rotate = False):
-        if title:
-            c = Canvas(self.width, self.height + titleHeight)
-        else:
-            c = Canvas(self.width, self.height)
+        c = Canvas(self.width, self.height)
         # Clearer when drawn in this order
         lst.reverse()
-        self.drawPaths(c, self.width, self.height, lst)
+        if title:
+            self.drawPaths(c, self.width, self.height-titleHeight, lst)
+        else:
+            self.drawPaths(c, self.width, self.height, lst)
 
         if title:
             ctx = c.ctx()
             ctx.select_font_face("Sans")
             ctx.set_font_size(titleHeight-self.TITLEGAP)
             ctx.set_source_rgb(0.3, 0.3, 0.3)
-            ctx.move_to(5, self.height + titleHeight - self.TITLEGAP)
+            ctx.move_to(5, self.height - self.TITLEGAP)
             ctx.text_path(title)
             ctx.fill()
 
