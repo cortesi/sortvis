@@ -12,7 +12,7 @@ class _GraphTest(libpry.AutoTree):
 
 class uPathDrawer(_GraphTest):
     def test_lineCoords(self):
-        p = graph.PathDrawer(100, 100, 5, 1, None)
+        p = graph.PathDrawer(100, 100, 5, 1)
         r = p.lineCoords([1, 2, 3, 4, 5], 5, 0.02)
         assert r[-1] == (1, 1)
         # Lead-in
@@ -23,7 +23,7 @@ class uPathDrawer(_GraphTest):
         assert r[-1][0] != r[-2][0]
 
     def test_draw(self):
-        p = graph.PathDrawer(100, 100, 5, 1, None)
+        p = graph.PathDrawer(100, 100, 5, 1)
         l = range(10)
         l.reverse()
         a = sortable.ListInsertion()(l)
