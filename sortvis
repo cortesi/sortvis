@@ -42,6 +42,13 @@ def main():
         help="Dump sequence"
     )
     parser.add_option(
+        "-p",
+        dest="printout",
+        default=False,
+        action="store_true",
+        help="Print traversal rather than drawing graph"
+    )
+    parser.add_option(
         "-x",
         dest="width",
         type="int",
@@ -127,7 +134,11 @@ def main():
     for i in todraw:
         a = i()
         sortd = a(lst)
-        ldrawer.draw(sortd, a.name, options.ofname or a.name, options.rotate)
+        if options.printout:
+            print a.name
+            for i in sortd:
+                print i.path
+        ldrawer.draw(sortd, a.name, options.ofname or (a.name+".png"), options.rotate)
 
 
 if __name__ == "__main__":

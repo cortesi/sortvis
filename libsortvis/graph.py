@@ -59,29 +59,32 @@ class PathDrawer:
         self.line, self.border = line, border
         self.highlights = highlights
 
-    def _lineCoords(self, elem, l):
-        init = 0.02 # Proportional initial length 
-        lst = []
-        xscale = (1.0-init)/len(elem.path)
-        yscale = 1.0/l
-        lst.append((0, yscale/2 + (yscale * elem.path[0])))
-        lst.append((init, yscale/2 + (yscale * elem.path[0])))
-        for i, v in enumerate(elem.path):
-            lst.append(((xscale * i) + init, yscale/2 + (yscale * v)))
-        lst.append((1, lst[-1][1]))
-        return lst
+    def lineCoords(self, positions, length, edge=0.02):
+        """
+            Returns a list of proportional (x, y) co-ordinates for a given list
+            of Y-offsets. Each co-ordinate value is a floating point number
+            between 0 and 1, inclusive.
+        """
+        xscale = (1.0-(2*edge))/(len(positions)-1)
+        yscale = 1.0/length
+        coords = []
+        coords.append((0, positions[0]*yscale))
+        for i, v in enumerate(positions):
+            coords.append(((xscale * i) + edge, v*yscale))
+        coords.append((1, v*yscale))
+        return coords
 
-    def draw(self, lst, title, fname, vertical=False):
+    def draw(self, lst, title, fname, rotate=False):
         c = Canvas(self.width, self.height + 20)
         # Clearer when drawn in this order
         l = reversed(lst)
         ctx = c.ctx()
         for elem in l:
-            for i in self._lineCoords(elem, len(lst)):
-                ctx.line_to(self.width * i[0], self.height * i[1])
+            for i in self.lineCoords(elem.path, len(lst)):
+                ctx.line_to(self.width * i[0], self.line + self.height * i[1])
             ctx.set_line_cap(cairo.LINE_CAP_BUTT)
             ctx.set_line_join(cairo.LINE_JOIN_ROUND)
-            if elem.i in self.highlights:
+            if self.highlights and elem.i in self.highlights:
                 ctx.set_source_rgb(*HIGHLIGHT)
             else:
                 x = 1 - (float(elem.i)/len(lst)*0.7)
@@ -94,10 +97,7 @@ class PathDrawer:
         ctx.set_font_size(15)
         ctx.set_source_rgb(0.3, 0.3, 0.3)
         ctx.move_to(5, self.height + 15)
-        # Don't put the number of comparisons in until we've revisited the algorithms
-        # to make sure the figures are sensible
-        # ctx.text_path(algo.name + "      " + "[%s comparisons]"%algo.comparisons)
         ctx.text_path(title)
         ctx.fill()
-        c.save("%s.png"%fname, vertical)
+        c.save(fname, rotate)
 
