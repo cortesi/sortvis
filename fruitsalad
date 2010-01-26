@@ -58,9 +58,9 @@ def main():
     parser.add_option(
         "-u",
         dest="unmoved",
-        default=False,
-        action="store_true",
-        help="Draw unmoved elements."
+        default=True,
+        action="store_false",
+        help="Don't draw elements until they move."
     )
     parser.add_option(
         "-v",
