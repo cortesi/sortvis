@@ -109,7 +109,7 @@ def main():
     if not options.width:
         options.width = int(options.height * 3)
 
-    ldrawer = graph.Grayscale(
+    ldrawer = graph.Weave(
         options.width,
         options.height,
     )

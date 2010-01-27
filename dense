@@ -29,6 +29,12 @@ def main():
         help="Read data from file"
     )
     parser.add_option(
+        "-g",
+        dest="grayscale",
+        default = False,
+        action="store_true",
+    )
+    parser.add_option(
         "-o",
         dest="ofname",
         help="Output file name. Only usable when a single algorithm is being drawn.",
@@ -82,7 +88,10 @@ def main():
         for i in lst:
             print i,
 
-    ldrawer = graph.Weave()
+    if options.grayscale:
+        ldrawer = graph.DenseGrayscale()
+    else:
+        ldrawer = graph.DenseFruitsalad()
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
 

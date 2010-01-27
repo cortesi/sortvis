@@ -68,6 +68,7 @@ class TimBreak(Exception): pass
 
 
 class TimWrapper:
+    list = None
     comparisons = 0
     limit = 0
     def __init__(self, n):
@@ -86,7 +87,9 @@ class TimWrapper:
 class Tim(Algorithm):
     name = "timsort"
     def makeList(self, entries):
-        return TrackList(entries, TimWrapper)
+        l = TrackList(entries, TimWrapper)
+        TimWrapper.list = l
+        return l
 
     def sort(self, lst):
         prev = [i.n for i in lst]

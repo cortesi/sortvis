@@ -10,9 +10,9 @@ class _GraphTest(libpry.AutoTree):
             os.mkdir(OUTDIR)
 
 
-class uGrayscale(_GraphTest):
+class uWeave(_GraphTest):
     def test_lineCoords(self):
-        p = graph.Grayscale(100, 100)
+        p = graph.Weave(100, 100)
         r = p.lineCoords([1, 2, 3, 4, 5], 5, 0.02)
         assert r[-1] == (1, 1)
         # Lead-in
@@ -23,16 +23,16 @@ class uGrayscale(_GraphTest):
         assert r[-1][0] != r[-2][0]
 
     def test_draw(self):
-        p = graph.Grayscale(100, 100)
+        p = graph.Weave(100, 100)
         l = range(10)
         l.reverse()
         a = sortable.ListInsertion()(l)
         p.draw(a, "test", os.path.join(OUTDIR, "test_grayscale.png"), 3, 2)
 
 
-class uWeave(_GraphTest):
+class uDense(_GraphTest):
     def test_draw(self):
-        p = graph.Weave()
+        p = graph.DenseFruitsalad()
         l = range(16)
         l.reverse()
         a = sortable.ListInsertion()(l)
@@ -40,6 +40,6 @@ class uWeave(_GraphTest):
 
 
 tests = [
-    uGrayscale(),
-    uWeave()
+    uWeave(),
+    uDense()
 ]

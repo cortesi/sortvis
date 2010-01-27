@@ -115,7 +115,7 @@ class _PathDrawer:
         raise NotImplementedError
 
 
-class Grayscale(_PathDrawer):
+class Weave(_PathDrawer):
     def __init__(self, width, height, titleHeight=20):
         self.width, self.height, self.titleHeight = width, height, titleHeight
 
@@ -149,30 +149,38 @@ class Grayscale(_PathDrawer):
         c.save(fname, rotate)
 
 
-if scurve:
-    class Weave(_PathDrawer):
-        def __init__(self, titleHeight=20):
-            self.titleHeight = titleHeight
 
+class Dense(_PathDrawer):
+    def __init__(self, titleHeight=20):
+        self.titleHeight = titleHeight
+
+    def draw(self, lst, title, fname, unmoved):
+        height = len(lst)
+        width = len(lst[0].path)
+        c = Canvas(width, height + (self.titleHeight if title else 0))
+        # Clearer when drawn in this order
+        lst.reverse()
+        self.drawPixels(c, lst, unmoved)
+        if title:
+            self.drawTitle(
+                c,
+                title,
+                5,
+                height+self.titleHeight-self.TITLEGAP,
+                self.titleHeight-self.TITLEGAP
+            )
+        c.save(fname, False)
+
+
+class DenseGrayscale(Dense):
+    def getColor(self, x, n):
+        return [x/float(n), x/float(n), x/float(n)]
+
+
+if scurve:
+    class DenseFruitsalad(Dense):
         def getColor(self, x, n):
             csource = scurve.fromSize("hilbert", 3, n)
             d = float(csource.dimensions()[0])
             return [i/d for i in csource.point(x)]
-
-        def draw(self, lst, title, fname, unmoved):
-            height = len(lst)
-            width = len(lst[0].path)
-            c = Canvas(width, height + (self.titleHeight if title else 0))
-            # Clearer when drawn in this order
-            lst.reverse()
-            self.drawPixels(c, lst, unmoved)
-            if title:
-                self.drawTitle(
-                    c,
-                    title,
-                    5,
-                    height+self.titleHeight-self.TITLEGAP,
-                    self.titleHeight-self.TITLEGAP
-                )
-            c.save(fname, False)
 
