@@ -61,9 +61,6 @@ class Algorithm:
         return lst
 
 
-# The TimSort stuff can be done more neatly, by inspecting the list from within
-# the __cmp__ method. This way we can also perform the entire trick with only
-# one sort. Then again, I'm lazy, and this works. ;)
 class TimBreak(Exception): pass
 
 
