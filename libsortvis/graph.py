@@ -1,4 +1,5 @@
 import cairo
+import math
 
 try:
     import scurve

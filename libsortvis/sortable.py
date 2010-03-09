@@ -266,4 +266,108 @@ class Radix(Algorithm):
             ones[:] = []
 
 
-algorithms = [Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell, Radix]
+class Stooge(Algorithm):
+    name = "stoogesort"
+    def sort(self, lst, i=0, j=None):
+        if j is None:
+            j = len(lst) - 1
+        if lst[j] < lst[i]:
+            lst[i], lst[j] = lst[j], lst[i]
+            lst.log()
+        if j - i > 1:
+            t = (j - i + 1) // 3
+            self.sort(lst, i, j - t)
+            self.sort(lst, i + t, j)
+            self.sort(lst, i, j - t)
+
+
+class Gnome(Algorithm):
+    name = "gnomesort"
+    def sort(self, lst):
+        i = 0
+        while i < len(lst):
+            if i == 0 or lst[i] >= lst[i - 1]:
+                i += 1
+            else:
+                lst[i], lst[i - 1] = lst[i - 1], lst[i]
+                lst.log()
+                i -= 1
+
+
+class Cocktail(Algorithm):
+    name = "cocktailsort"
+    def sort(self, lst):
+        begin, end = 0, len(lst) - 1
+        finished = False
+        while not finished:
+            finished = True
+            for i in xrange(begin, end):
+                if lst[i] > lst[i + 1]:
+                    lst[i], lst[i + 1] = lst[i + 1], lst[i]
+                    lst.log()
+                    finished = False
+            if finished:
+                break
+            finished = True
+            end -= 1
+            for i in reversed(xrange(begin, end)):
+                if lst[i] > lst[i + 1]:
+                    lst[i], lst[i + 1] = lst[i + 1], lst[i]
+                    lst.log()
+                    finished = False
+            begin += 1
+
+
+class OddEven(Algorithm):
+    name = "oddevensort"
+    def sort(self, lst, nloops=2):
+        finished = False
+        while not finished:
+            finished = True
+            for n in xrange(nloops):
+                for i in xrange(n, len(lst) - 1, nloops):
+                    if lst[i] > lst[i + 1]:
+                        lst[i], lst[i + 1] = lst[i + 1], lst[i]
+                        lst.log()
+                        finished = False
+
+
+class Comb(Algorithm):
+    name = "combsort"
+    def sort(self, lst):
+        gap = len(lst)
+        finished = False
+        while not finished:
+            gap = int(gap / 1.25)
+            finished = True
+            for i in xrange(len(lst) - gap):
+                if lst[i] > lst[i + gap]:
+                    lst[i], lst[i + gap] = lst[i + gap], lst[i]
+                    lst.log()
+                    finished = False
+
+
+class Merge(Algorithm):
+    name = "mergesort"
+    def sort(self, lst, left=0, right=None):
+        if right is None:
+            right = len(lst) - 1
+        if left >= right:
+            return
+        middle = (left + right) // 2
+        self.sort(lst, left, middle)
+        self.sort(lst, middle + 1, right)
+        i, end_i, j = left, middle, middle + 1
+        while i <= end_i and j <= right:
+            if lst[i] < lst[j]:
+                i += 1
+                continue
+            lst[i], lst[i+1:j+1] = lst[j], lst[i:j]
+            lst.log()
+            i, end_i, j = i + 1, end_i + 1, j + 1
+
+
+algorithms = [
+    Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell, Radix, Stooge, 
+    Gnome, Cocktail, OddEven, Comb, Merge
+]
