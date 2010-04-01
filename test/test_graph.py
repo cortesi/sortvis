@@ -33,7 +33,7 @@ class uWeave(_GraphTest):
 class uDense(_GraphTest):
     def test_draw(self):
         p = graph.DenseFruitsalad()
-        l = range(16)
+        l = range(8)
         l.reverse()
         a = sortable.ListInsertion()(l)
         p.draw(a, "test", os.path.join(OUTDIR, "test_weave.png"), True)
