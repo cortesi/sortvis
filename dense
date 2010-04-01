@@ -19,7 +19,7 @@ def main():
     parser.add_option(
         "-n",
         dest="numelements",
-        default="300",
+        default="256",
         type="int",
         help="Generate a random sorting sequence of length n"
     )
