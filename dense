@@ -19,7 +19,7 @@ def main():
     parser.add_option(
         "-n",
         dest="numelements",
-        default="256",
+        default="512",
         type="int",
         help="Generate a random sorting sequence of length n"
     )
@@ -75,6 +75,12 @@ def main():
         action="store_true",
         help="Be verbose."
     )
+    parser.add_option(
+        "-x",
+        dest="prefix",
+        help="Output file name prefix.",
+        default=""
+    )
     options, args = parser.parse_args()
     if args:
         parser.error("Script takes no arguments.")
@@ -112,10 +118,14 @@ def main():
             print a.name
             for i in sortd:
                 print i.path
+        if options.ofname:
+            name = options.prefix + options.ofname
+        else:
+            name = options.prefix + a.name + ".png"
         ldrawer.draw(
             sortd,
             a.name if options.title else None,
-            options.ofname or (a.name+".png"),
+            name,
             options.unmoved
         )
 

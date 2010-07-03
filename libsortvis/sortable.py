@@ -368,6 +368,6 @@ class Merge(Algorithm):
 
 
 algorithms = [
-    Tim, Quick, Heap, Selection, ListInsertion, Bubble, Shell, Radix, Stooge, 
+    Quick, Tim, Heap, Selection, ListInsertion, Bubble, Shell, Radix, Stooge, 
     Gnome, Cocktail, OddEven, Comb, Merge
 ]
