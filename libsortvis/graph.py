@@ -180,8 +180,23 @@ class DenseGrayscale(Dense):
 
 if scurve:
     class DenseFruitsalad(Dense):
+        csource = None
+        def findSize(self, n):
+            """
+                Return the smallest Hilbert curve size larger than n. 
+            """
+            for i in range(100):
+                s = 2**(3*i)
+                if s >= n:
+                    return s
+            raise ValueError("Number of elements impossibly large.")
+
         def getColor(self, x, n):
-            csource = scurve.fromSize("hilbert", 3, n)
-            d = float(csource.dimensions()[0])
-            return [i/d for i in csource.point(x)]
+            if not self.csource:
+                self.csource = scurve.fromSize("hilbert", 3, self.findSize(n))
+            d = float(self.csource.dimensions()[0])
+            # Scale X to sample evenly from the curve, if the list length isn't
+            # an exact match for the Hilbert curve size.
+            x = x*int(len(self.csource)/float(n))
+            return [i/d for i in self.csource.point(x)]
 
