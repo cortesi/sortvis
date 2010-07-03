@@ -336,15 +336,17 @@ class Comb(Algorithm):
     name = "combsort"
     def sort(self, lst):
         gap = len(lst)
-        finished = False
-        while not finished:
+        swaps = False
+        while 1:
             gap = int(gap / 1.25)
-            finished = True
+            swaps = False
             for i in xrange(len(lst) - gap):
                 if lst[i] > lst[i + gap]:
                     lst[i], lst[i + gap] = lst[i + gap], lst[i]
                     lst.log()
-                    finished = False
+                    swaps = True
+            if not swaps and gap <= 1:
+                break
 
 
 class Merge(Algorithm):
