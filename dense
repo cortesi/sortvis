@@ -76,7 +76,7 @@ def main():
         help="Be verbose."
     )
     parser.add_option(
-        "-x",
+        "-e",
         dest="prefix",
         help="Output file name prefix.",
         default=""
@@ -111,17 +111,17 @@ def main():
 
     for i in todraw:
         a = i()
+        if options.ofname:
+            name = options.prefix + options.ofname
+        else:
+            name = options.prefix + a.name + ".png"
         if options.verbose:
-            print a.name
+            print name
         sortd = a(lst)
         if options.printout:
             print a.name
             for i in sortd:
                 print i.path
-        if options.ofname:
-            name = options.prefix + options.ofname
-        else:
-            name = options.prefix + a.name + ".png"
         ldrawer.draw(
             sortd,
             a.name if options.title else None,

@@ -90,6 +90,19 @@ def main():
         action="store_true",
         help="Add a title to image."
     )
+    parser.add_option(
+        "-e",
+        dest="prefix",
+        help="Output file name prefix.",
+        default=""
+    )
+    parser.add_option(
+        "-v",
+        dest="verbose",
+        default=False,
+        action="store_true",
+        help="Be verbose."
+    )
     options, args = parser.parse_args()
     if args:
         parser.error("Script takes no arguments.")
@@ -127,14 +140,23 @@ def main():
     for i in todraw:
         a = i()
         sortd = a(lst)
+
+        if options.ofname:
+            name = options.prefix + options.ofname
+        else:
+            name = options.prefix + a.name + ".png"
+        if options.verbose:
+            print name
+
         if options.printout:
             print a.name
             for i in sortd:
                 print i.path
+
         ldrawer.draw(
             sortd,
             a.name if options.title else None,
-            options.ofname or (a.name+".png"),
+            name,
             options.line,
             options.border,
             rotate = options.rotate,
