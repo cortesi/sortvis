@@ -6,15 +6,19 @@ try:
 except ImportError:
     scurve = None
 
-def intRGB(r, g, b):
-        return (r/255.0, g/255.0, b/255.0)
 
-
-HIGHLIGHT=intRGB(0xff, 0x72, 0x72)
-
-
+def rgb(x):
+    if isinstance(x, tuple) or isinstance(x, list):
+        return (x[0]/255.0, x[1]/255.0, x[2]/255.0)
+    elif isinstance(x, basestring):
+        if len(x) != 6:
+            raise ValueError("RGB specifier must be 6 characters long.")
+        return rgb([int(i, 16) for i in (x[0:2], x[2:4], x[4:6])])
+    raise ValueError("Invalid RGB specifier.")
+                
+    
 class NiceCtx(cairo.Context):
-    defaultBorderColour = intRGB(0x7d, 0x7d, 0x7d)
+    defaultBorderColour = rgb((0x7d, 0x7d, 0x7d))
     def stroke_border(self, border):
         src = self.get_source()
         width = self.get_line_width()
@@ -27,17 +31,18 @@ class NiceCtx(cairo.Context):
 
 
 class Canvas:
-    def __init__(self, width, height):
+    def __init__(self, width, height, background):
         self.width, self.height = width, height
+        self.background = background
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-        self.background(1, 1, 1)
+        self.set_background(background)
 
     def ctx(self):
         return NiceCtx(self.surface)
 
-    def background(self, r, g, b):
+    def set_background(self, color):
         c = self.ctx()
-        c.set_source_rgb(r, g, b)
+        c.set_source_rgb(*color)
         c.rectangle(0, 0, self.width, self.height)
         c.fill()
         c.stroke()
@@ -117,15 +122,16 @@ class _PathDrawer:
 
 
 class Weave(_PathDrawer):
-    def __init__(self, width, height, titleHeight=20):
+    def __init__(self, width, height, titleHeight, background):
         self.width, self.height, self.titleHeight = width, height, titleHeight
+        self.background = background
 
     def getColor(self, x, n):
         v = 1 - (float(x)/n*0.7)
         return (v, v, v)
 
     def draw(self, lst, title, fname, linewidth, borderwidth, rotate=False):
-        c = Canvas(self.width, self.height)
+        c = Canvas(self.width, self.height, self.background)
         # Clearer when drawn in this order
         lst.reverse()
         if title:
@@ -152,13 +158,14 @@ class Weave(_PathDrawer):
 
 
 class Dense(_PathDrawer):
-    def __init__(self, titleHeight=20):
+    def __init__(self, titleHeight, background):
         self.titleHeight = titleHeight
+        self.background = background
 
     def draw(self, lst, title, fname, unmoved):
         height = len(lst)
         width = len(lst[0].path)
-        c = Canvas(width, height + (self.titleHeight if title else 0))
+        c = Canvas(width, height + (self.titleHeight if title else 0), self.background)
         # Clearer when drawn in this order
         lst.reverse()
         self.drawPixels(c, lst, unmoved)

@@ -81,6 +81,15 @@ def main():
         help="Output file name prefix.",
         default=""
     )
+
+    parser.add_option(
+        "--background",
+        dest="background",
+        type="str",
+        default="ffffff",
+        help="Background colour."
+    )
+
     options, args = parser.parse_args()
     if args:
         parser.error("Script takes no arguments.")
@@ -94,10 +103,15 @@ def main():
         for i in lst:
             print i,
 
+    try:
+        background = graph.rgb(options.background)
+    except ValueError, v:
+        parser.error("Invalid background - " + str(v))
+
     if options.grayscale:
-        ldrawer = graph.DenseGrayscale()
+        ldrawer = graph.DenseGrayscale(20, background)
     else:
-        ldrawer = graph.DenseFruitsalad()
+        ldrawer = graph.DenseFruitsalad(20, background)
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
 

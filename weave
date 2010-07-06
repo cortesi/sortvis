@@ -103,6 +103,15 @@ def main():
         action="store_true",
         help="Be verbose."
     )
+
+    parser.add_option(
+        "--background",
+        dest="background",
+        type="str",
+        default="ffffff",
+        help="Background colour."
+    )
+
     options, args = parser.parse_args()
     if args:
         parser.error("Script takes no arguments.")
@@ -122,9 +131,16 @@ def main():
     if not options.width:
         options.width = int(options.height * 3)
 
+    try:
+        background = graph.rgb(options.background)
+    except ValueError, v:
+        parser.error("Invalid background - " + str(v))
+
     ldrawer = graph.Weave(
         options.width,
         options.height,
+        20, 
+        background
     )
     if options.algorithm:
         selected = [i.lower() for i in options.algorithm]
