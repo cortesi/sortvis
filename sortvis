@@ -1,0 +1,264 @@
+#!/usr/bin/env python
+import random, math, sys
+from optparse import OptionParser, OptionGroup
+from libsortvis import sortable, graph
+
+
+def main():
+    usage = "usage: %prog [dense|weave] [options]"
+    parser = OptionParser(usage)
+    parser.add_option(
+        "-a",
+        dest="algorithm",
+        default=[],
+        type="choice",
+        action="append",
+        choices=[i.name for i in sortable.algorithms],
+        help="Draw only a named algorithm."
+    )
+    parser.add_option(
+        "-c",
+        action="store", dest="csource",
+        default="gradient", type="choice",
+        choices=[
+            "gradient",
+            "hilbert",
+        ],
+        help="Colour source - 'gradient' or 'hilbert'."
+    )
+    parser.add_option(
+        "-n",
+        dest="numelements",
+        default="20",
+        type="int",
+        help="Generate a random sorting sequence of length n"
+    )
+    parser.add_option(
+        "-f",
+        dest="readfile",
+        help="Read list of digits from file"
+    )
+    parser.add_option(
+        "-o",
+        dest="ofname",
+        help="Output file name. Only usable when a single algorithm is being drawn.",
+        default=""
+    )
+    parser.add_option(
+        "-d",
+        dest="dump",
+        default=False,
+        action="store_true",
+        help="Dump sequence"
+    )
+    parser.add_option(
+        "-p",
+        dest="printout",
+        default=False,
+        action="store_true",
+        help="Print traversal rather than drawing graph"
+    )
+    parser.add_option(
+        "-t",
+        dest="title",
+        default=False,
+        action="store_true",
+        help="Add a title to image."
+    )
+    parser.add_option(
+        "--title-height",
+        dest="titleheight",
+        type="int",
+        default=20,
+        help="Title height."
+    )
+    parser.add_option(
+        "-e",
+        dest="prefix",
+        help="Output file name prefix.",
+        default=""
+    )
+    parser.add_option(
+        "-v",
+        dest="verbose",
+        default=False,
+        action="store_true",
+        help="Be verbose."
+    )
+    parser.add_option(
+        "--background",
+        dest="background",
+        type="str",
+        default="ffffff",
+        help="Background colour - default ffffff."
+    )
+    parser.add_option(
+        "--gradient-start",
+        dest="gradient_start",
+        type="str",
+        default="ffffff",
+        help="Gradient start colour - default ffffff."
+    )
+    parser.add_option(
+        "--gradient-end",
+        dest="gradient_end",
+        type="str",
+        default="606060",
+        help="Gradient end colour - default 606060."
+    )
+
+    group = OptionGroup(
+        parser,
+        "Weave",
+        "Weave visualisation options."
+    )
+    group.add_option(
+        "-x",
+        dest="width",
+        type="int",
+        default=None,
+        help="Image width"
+    )
+    group.add_option(
+        "-y",
+        dest="height",
+        type="int",
+        default=None,
+        help="Image height"
+    )
+    group.add_option(
+        "--line-width",
+        dest="line",
+        type="int",
+        default=6,
+        help="Total line width"
+    )
+    group.add_option(
+        "--border-width",
+        dest="border",
+        type="int",
+        default=1,
+        help="Border width"
+    )
+    group.add_option(
+        "-r",
+        dest="rotate",
+        default=False,
+        action="store_true",
+        help="Rotate images 90 degrees"
+    )
+    parser.add_option_group(group)
+
+    group = OptionGroup(
+        parser,
+        "Dense",
+        "Dense visualisation options."
+    )
+    group.add_option(
+        "-u",
+        dest="unmoved",
+        default=False,
+        action="store_true",
+        help="Don't draw elements until they move"
+    )
+
+    parser.add_option_group(group)
+
+    options, args = parser.parse_args()
+    if len(args) != 1:
+        parser.error("Please specify a visualisation - dense or weave.")
+
+    if options.csource == "gradient":
+        try:
+            gstart = graph.rgb(options.gradient_start)
+        except ValueError, v:
+            parser.error("Invalid gradient start - " + str(v))
+        try:
+            gend = graph.rgb(options.gradient_end)
+        except ValueError, v:
+            parser.error("Invalid gradient end - " + str(v))
+        csource = graph.ColourGradient(gstart, gend)
+    elif options.csource == "hilbert":
+        csource = graph.ColourHilbert()
+    else:
+        parser.error("Unknown colour source: %s"%options.csource) 
+
+    if options.readfile:
+        txt = file(options.readfile).read().split()
+        lst = [int(i) for i in txt]
+    else:
+        lst = range(options.numelements)
+        random.shuffle(lst)
+
+    if options.dump:
+        for i in lst:
+            print i,
+
+    try:
+        background = graph.rgb(options.background)
+    except ValueError, v:
+        parser.error("Invalid background - " + str(v))
+
+    if args[0] == "weave":
+        if not options.height:
+            options.height = (options.line + options.border + 5) * len(lst)
+        if not options.width:
+            options.width = int(options.height * 3)
+
+        ldrawer = graph.Weave(
+            csource,
+            options.width,
+            options.height,
+            20, 
+            background,
+            options.rotate,
+            options.line,
+            options.border
+        )
+    elif args[0] == "dense":
+        ldrawer = graph.Dense(
+                        csource,
+                        options.titleheight,
+                        background,
+                        options.rotate
+                    )
+    else:
+        parser.error("Unknown visualisation: %s"%args[0])
+
+
+    if options.algorithm:
+        selected = [i.lower() for i in options.algorithm]
+
+    if options.algorithm:
+        todraw = [i for i in sortable.algorithms if i.name in options.algorithm]
+    else:
+        todraw = [i for i in sortable.algorithms]
+
+    if options.ofname and len(todraw) > 1:
+        parser.error("Cannot specify output file name when drawing more than one algorithm.")
+
+    for i in todraw:
+        a = i()
+        sortd = a(lst)
+
+        if options.ofname:
+            name = options.prefix + options.ofname
+        else:
+            name = options.prefix + a.name + ".png"
+        if options.verbose:
+            print name
+
+        if options.printout:
+            print a.name
+            for i in sortd:
+                print i.path
+
+        ldrawer.draw(
+            sortd,
+            a.name if options.title else None,
+            name,
+        )
+
+
+if __name__ == "__main__":
+    main()

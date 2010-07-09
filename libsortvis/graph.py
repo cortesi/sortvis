@@ -15,6 +15,51 @@ def rgb(x):
             raise ValueError("RGB specifier must be 6 characters long.")
         return rgb([int(i, 16) for i in (x[0:2], x[2:4], x[4:6])])
     raise ValueError("Invalid RGB specifier.")
+
+
+class ColourGradient:
+    """
+        A straight line drawn through the colour cube from a start value to an
+        end value.
+    """
+    name = "gradient"
+    def __init__(self, start, end):
+        self.start, self.end = start, end
+
+    def colour(self, x, l):
+        scale = x/float(l)
+        parts = list(self.start)
+        for i, v in enumerate(parts):
+            parts[i] = parts[i] + (self.start[i]-self.end[i])*scale*-1
+        return tuple(parts)
+
+
+class ColourHilbert:
+    """
+        A Hilbert-order traversal of the colour cube. 
+    """
+    def __init__(self):
+        self.size = None
+        self.curve = None
+
+    def findSize(self, n):
+        """
+            Return the smallest Hilbert curve size larger than n. 
+        """
+        for i in range(100):
+            s = 2**(3*i)
+            if s >= n:
+                return s
+        raise ValueError("Number of elements impossibly large.")
+
+    def colour(self, x, n):
+        if n != self.size:
+            self.curve = scurve.fromSize("hilbert", 3, self.findSize(n))
+        d = float(self.curve.dimensions()[0])
+        # Scale X to sample evenly from the curve, if the list length isn't
+        # an exact match for the Hilbert curve size.
+        x = x*int(len(self.curve)/float(n))
+        return tuple([i/d for i in self.curve.point(x)])
                 
     
 class NiceCtx(cairo.Context):
@@ -40,9 +85,9 @@ class Canvas:
     def ctx(self):
         return NiceCtx(self.surface)
 
-    def set_background(self, color):
+    def set_background(self, colour):
         c = self.ctx()
-        c.set_source_rgb(*color)
+        c.set_source_rgb(*colour)
         c.rectangle(0, 0, self.width, self.height)
         c.fill()
         c.stroke()
@@ -66,6 +111,12 @@ class Canvas:
 
 class _PathDrawer:
     TITLEGAP = 5
+    def __init__(self, csource):
+        """
+            csource: A colour source
+        """
+        self.csource = csource
+
     def lineCoords(self, positions, length, edge=0.02):
         """
             Returns a list of proportional (x, y) co-ordinates for a given list
@@ -90,13 +141,13 @@ class _PathDrawer:
         for elem in lst:
             for i in self.lineCoords(elem.path, len(lst)):
                 ctx.line_to(width * i[0], linewidth + height * i[1])
-            ctx.set_source_rgb(*self.getColor(elem.i, len(lst)))
+            ctx.set_source_rgb(*self.csource.colour(elem.i, len(lst)))
             ctx.stroke_border(borderwidth)
 
     def drawPixels(self, canvas, lst, unmoved):
         ctx = canvas.ctx()
         for elem in lst:
-            ctx.set_source_rgb(*self.getColor(elem.i, len(lst)))
+            ctx.set_source_rgb(*self.csource.colour(elem.i, len(lst)))
             moved = unmoved
             for x, y in enumerate(elem.path):
                 if y != elem.path[0]:
@@ -114,37 +165,34 @@ class _PathDrawer:
         ctx.text_path(title)
         ctx.fill()
 
-    def getColor(self, x, n):
-        """
-            Retrieve the color for item x out of n.
-        """
-        raise NotImplementedError
-
 
 class Weave(_PathDrawer):
-    def __init__(self, width, height, titleHeight, background):
+    def __init__(self, csource, width, height, titleHeight, background,
+                       rotate, linewidth, borderwidth):
+        _PathDrawer.__init__(self, csource)
         self.width, self.height, self.titleHeight = width, height, titleHeight
         self.background = background
+        self.rotate, self.linewidth, self.borderwidth = rotate, linewidth, borderwidth
 
     def getColor(self, x, n):
         v = 1 - (float(x)/n*0.7)
         return (v, v, v)
 
-    def draw(self, lst, title, fname, linewidth, borderwidth, rotate=False):
+    def draw(self, lst, title, fname):
         c = Canvas(self.width, self.height, self.background)
         # Clearer when drawn in this order
         lst.reverse()
         if title:
             self.drawPaths(
                 c,
-                linewidth,
-                borderwidth,
+                self.linewidth,
+                self.borderwidth,
                 self.width,
                 self.height-self.titleHeight,
                 lst
             )
         else:
-            self.drawPaths(c, linewidth, borderwidth, self.width, self.height, lst)
+            self.drawPaths(c, self.linewidth, self.borderwidth, self.width, self.height, lst)
         if title:
             self.drawTitle(
                 c,
@@ -153,22 +201,23 @@ class Weave(_PathDrawer):
                 self.height-self.TITLEGAP,
                 self.titleHeight-self.TITLEGAP
             )
-        c.save(fname, rotate)
-
+        c.save(fname, self.rotate)
 
 
 class Dense(_PathDrawer):
-    def __init__(self, titleHeight, background):
+    def __init__(self, csource, titleHeight, background, unmoved):
+        _PathDrawer.__init__(self, csource)
         self.titleHeight = titleHeight
         self.background = background
+        self.unmoved = unmoved
 
-    def draw(self, lst, title, fname, unmoved):
+    def draw(self, lst, title, fname):
         height = len(lst)
         width = len(lst[0].path)
         c = Canvas(width, height + (self.titleHeight if title else 0), self.background)
         # Clearer when drawn in this order
         lst.reverse()
-        self.drawPixels(c, lst, unmoved)
+        self.drawPixels(c, lst, not self.unmoved)
         if title:
             self.drawTitle(
                 c,
@@ -179,31 +228,4 @@ class Dense(_PathDrawer):
             )
         c.save(fname, False)
 
-
-class DenseGrayscale(Dense):
-    def getColor(self, x, n):
-        return [x/float(n), x/float(n), x/float(n)]
-
-
-if scurve:
-    class DenseFruitsalad(Dense):
-        csource = None
-        def findSize(self, n):
-            """
-                Return the smallest Hilbert curve size larger than n. 
-            """
-            for i in range(100):
-                s = 2**(3*i)
-                if s >= n:
-                    return s
-            raise ValueError("Number of elements impossibly large.")
-
-        def getColor(self, x, n):
-            if not self.csource:
-                self.csource = scurve.fromSize("hilbert", 3, self.findSize(n))
-            d = float(self.csource.dimensions()[0])
-            # Scale X to sample evenly from the curve, if the list length isn't
-            # an exact match for the Hilbert curve size.
-            x = x*int(len(self.csource)/float(n))
-            return [i/d for i in self.csource.point(x)]
 

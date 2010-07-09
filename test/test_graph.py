@@ -9,9 +9,14 @@ class _GraphTest(libpry.AutoTree):
         if not os.path.exists(OUTDIR):
             os.mkdir(OUTDIR)
 
+
 class uWeave(_GraphTest):
     def test_lineCoords(self):
-        p = graph.Weave(100, 100, 20, graph.rgb("ffffff"))
+        csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
+        p = graph.Weave(
+            csource, 100, 100, 20, graph.rgb("ffffff"),
+            False, 6, 1
+        )
         r = p.lineCoords([1, 2, 3, 4, 5], 5, 0.02)
         assert r[-1] == (1, 1)
         # Lead-in
@@ -22,20 +27,25 @@ class uWeave(_GraphTest):
         assert r[-1][0] != r[-2][0]
 
     def test_draw(self):
-        p = graph.Weave(100, 100, 20, graph.rgb("ffffff"))
+        csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
+        p = graph.Weave(
+            csource, 100, 100, 20, graph.rgb("ffffff"),
+            False, 6, 1
+        )
         l = range(10)
         l.reverse()
         a = sortable.ListInsertion()(l)
-        p.draw(a, "test", os.path.join(OUTDIR, "test_grayscale.png"), 3, 2)
+        p.draw(a, "test", os.path.join(OUTDIR, "test_grayscale.png"))
 
 
 class uDense(_GraphTest):
     def test_draw(self):
-        p = graph.DenseFruitsalad(20, graph.rgb("ffffff"))
+        csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
+        p = graph.Dense(csource, 20, graph.rgb("ffffff"), False)
         l = range(8)
         l.reverse()
         a = sortable.ListInsertion()(l)
-        p.draw(a, "test", os.path.join(OUTDIR, "test_weave.png"), True)
+        p.draw(a, "test", os.path.join(OUTDIR, "test_weave.png"))
 
 
 class uUtils(libpry.AutoTree):
@@ -45,8 +55,28 @@ class uUtils(libpry.AutoTree):
         assert graph.rgb("000000") == (0, 0, 0)
 
 
+class uColourSource(libpry.AutoTree):
+    def test_gradient(self):
+        g = graph.ColourGradient((1, 1, 1), (0, 0, 0))
+        assert g.colour(0, 10) == (1.0, 1.0, 1.0)
+        assert g.colour(10, 10) == (0, 0, 0)
+        assert g.colour(5, 10) == (0.5, 0.5, 0.5)
+
+        g = graph.ColourGradient((0, 0, 0), (1, 1, 1))
+        assert g.colour(0, 10) == (0, 0, 0)
+        assert g.colour(10, 10) == (1.0, 1.0, 1.0)
+        assert g.colour(5, 10) == (0.5, 0.5, 0.5)
+
+    def test_hilbert(self):
+        g = graph.ColourHilbert()
+        assert g.colour(50, 200)
+        assert g.colour(50, 200)
+
+
+
 tests = [
     uWeave(),
     uDense(),
-    uUtils()
+    uUtils(),
+    uColourSource()
 ]
