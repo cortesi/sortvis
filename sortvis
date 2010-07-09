@@ -220,7 +220,7 @@ def main():
                         csource,
                         options.titleheight,
                         background,
-                        options.rotate
+                        options.unmoved
                     )
     else:
         parser.error("Unknown visualisation: %s"%args[0])

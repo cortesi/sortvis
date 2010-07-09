@@ -141,8 +141,12 @@ class _PathDrawer:
         for elem in lst:
             for i in self.lineCoords(elem.path, len(lst)):
                 ctx.line_to(width * i[0], linewidth + height * i[1])
-            ctx.set_source_rgb(*self.csource.colour(elem.i, len(lst)))
-            ctx.stroke_border(borderwidth)
+            c = self.csource.colour(elem.i, len(lst)) + (1,)
+            ctx.set_source_rgba(*c)
+            if borderwidth:
+                ctx.stroke_border(borderwidth)
+            else:
+                ctx.stroke()
 
     def drawPixels(self, canvas, lst, unmoved):
         ctx = canvas.ctx()
