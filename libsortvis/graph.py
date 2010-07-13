@@ -160,21 +160,22 @@ class _PathDrawer:
                     ctx.rectangle(x, y, 1, 1)
                     ctx.fill()
 
-    def drawTitle(self, canvas, title, xpos, ypos, size, font="Sans"):
+    def drawTitle(self, canvas, title, xpos, ypos, size, colour, font="Sans"):
         ctx = canvas.ctx()
         ctx.select_font_face(font)
         ctx.set_font_size(size)
-        ctx.set_source_rgb(0.3, 0.3, 0.3)
+        ctx.set_source_rgb(*colour)
         ctx.move_to(xpos, ypos)
         ctx.text_path(title)
         ctx.fill()
 
 
 class Weave(_PathDrawer):
-    def __init__(self, csource, width, height, titleHeight, background,
+    def __init__(self, csource, width, height, titleHeight, titleColour, background,
                        rotate, linewidth, borderwidth):
         _PathDrawer.__init__(self, csource)
         self.width, self.height, self.titleHeight = width, height, titleHeight
+        self.titleColour = titleColour
         self.background = background
         self.rotate, self.linewidth, self.borderwidth = rotate, linewidth, borderwidth
 
@@ -203,14 +204,16 @@ class Weave(_PathDrawer):
                 title,
                 5,
                 self.height-self.TITLEGAP,
-                self.titleHeight-self.TITLEGAP
+                self.titleHeight-self.TITLEGAP,
+                self.titleColour
             )
         c.save(fname, self.rotate)
 
 
 class Dense(_PathDrawer):
-    def __init__(self, csource, titleHeight, background, unmoved):
+    def __init__(self, csource, titleHeight, titleColour, background, unmoved):
         _PathDrawer.__init__(self, csource)
+        self.titleColour = titleColour
         self.titleHeight = titleHeight
         self.background = background
         self.unmoved = unmoved
@@ -228,7 +231,8 @@ class Dense(_PathDrawer):
                 title,
                 5,
                 height+self.titleHeight-self.TITLEGAP,
-                self.titleHeight-self.TITLEGAP
+                self.titleHeight-self.TITLEGAP,
+                self.titleColour
             )
         c.save(fname, False)
 

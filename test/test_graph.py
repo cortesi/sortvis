@@ -14,7 +14,7 @@ class uWeave(_GraphTest):
     def test_lineCoords(self):
         csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
         p = graph.Weave(
-            csource, 100, 100, 20, graph.rgb("ffffff"),
+            csource, 100, 100, 20, graph.rgb("ffffff"), graph.rgb("000000"),
             False, 6, 1
         )
         r = p.lineCoords([1, 2, 3, 4, 5], 5, 0.02)
@@ -29,7 +29,9 @@ class uWeave(_GraphTest):
     def test_draw(self):
         csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
         p = graph.Weave(
-            csource, 100, 100, 20, graph.rgb("ffffff"),
+            csource, 100, 100, 20,
+            graph.rgb("ffffff"),
+            graph.rgb("000000"),
             False, 6, 1
         )
         l = range(10)
@@ -41,7 +43,7 @@ class uWeave(_GraphTest):
 class uDense(_GraphTest):
     def test_draw(self):
         csource = graph.ColourGradient((1, 1, 1), (0, 0, 0))
-        p = graph.Dense(csource, 20, graph.rgb("ffffff"), False)
+        p = graph.Dense(csource, 20, graph.rgb("ffffff"), graph.rgb("000000"), False)
         l = range(8)
         l.reverse()
         a = sortable.ListInsertion()(l)

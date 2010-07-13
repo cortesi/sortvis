@@ -73,6 +73,13 @@ def main():
         help="Title height."
     )
     parser.add_option(
+        "--title-colour",
+        dest="titlecolour",
+        type="str",
+        default="303030",
+        help="Title font colour."
+    )
+    parser.add_option(
         "-e",
         dest="prefix",
         help="Output file name prefix.",
@@ -199,6 +206,11 @@ def main():
     except ValueError, v:
         parser.error("Invalid background - " + str(v))
 
+    try:
+        titlecolour = graph.rgb(options.titlecolour)
+    except ValueError, v:
+        parser.error("Invalid title colour - " + str(v))
+
     if args[0] == "weave":
         if not options.height:
             options.height = (options.line + options.border + 5) * len(lst)
@@ -209,7 +221,8 @@ def main():
             csource,
             options.width,
             options.height,
-            20, 
+            options.titleheight,
+            titlecolour,
             background,
             options.rotate,
             options.line,
@@ -219,6 +232,7 @@ def main():
         ldrawer = graph.Dense(
                         csource,
                         options.titleheight,
+                        titlecolour,
                         background,
                         options.unmoved
                     )
