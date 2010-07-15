@@ -393,33 +393,27 @@ class Smooth(Algorithm):
         return self.MultiplyDeBruijnBitPosition[(((v & -v) * 0x077CB531L) >> 27) & 0b11111]
 
     def sift(self, lst, pshift, head):
-        val = lst[head]
         while pshift > 1:
             rt = head - 1
             lf = head - 1 - self.LP[pshift - 2]
 
-            if val >= lst[lf] and val >= lst[rt]:
+            if lst[head] >= lst[lf] and lst[head] >= lst[rt]:
                 break
             if lst[lf] >= lst[rt]:
-                lst[head] = lst[lf]
+                lst[head],lst[lf] = lst[lf],lst[head]
                 head = lf
                 pshift -= 1
                 lst.log()
             else:
-                lst[head] = lst[rt]
+                lst[head],lst[rt] = lst[rt],lst[head]
                 head = rt
                 pshift -= 2
                 lst.log()
 
-        if lst[head] != val:
-            lst[head] = val
-            lst.log()
-
     def trinkle(self, lst, p, pshift, head, trusty):
-        val = lst[head]
         while p != 1:
             stepson = head - self.LP[pshift]
-            if lst[stepson] <= val:
+            if lst[stepson] <= lst[head]:
                 break
             if not trusty and pshift > 1:
                 rt = head - 1
@@ -427,7 +421,7 @@ class Smooth(Algorithm):
                 if lst[rt] >= lst[stepson] or lst[lf] >= lst[stepson]:
                     break
 
-            lst[head] = lst[stepson]
+            lst[head],lst[stepson] = lst[stepson],lst[head]
             lst.log()
 
             head = stepson
@@ -437,8 +431,6 @@ class Smooth(Algorithm):
             trusty = False
 
         if not trusty:
-            lst[head] = val
-            lst.log()
             self.sift(lst, pshift, head)
 
     def sort(self, lst):
@@ -462,9 +454,12 @@ class Smooth(Algorithm):
                 else:
                     p <<= pshift - 1
                     pshift = 1
+
             p |= 1
             head += 1
+
         self.trinkle(lst, p, pshift, head, False)
+
         while pshift != 1 or p != 1:
             if pshift <= 1:
                 trail = self.trailingzeroes(p & ~1)
