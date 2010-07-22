@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import random, math, sys
 from optparse import OptionParser, OptionGroup
-from libsortvis import sortable, graph
+from libsortvis import sortable, graph, algos
 
 
 def main():
@@ -13,7 +13,7 @@ def main():
         default=[],
         type="choice",
         action="append",
-        choices=[i.name for i in sortable.algorithms],
+        choices=algos.algorithms.keys(),
         help="Draw only a named algorithm."
     )
     parser.add_option(
@@ -244,32 +244,32 @@ def main():
         selected = [i.lower() for i in options.algorithm]
 
     if options.algorithm:
-        todraw = [i for i in sortable.algorithms if i.name in options.algorithm]
+        todraw = [i for i in algos.algorithms.keys() if i in options.algorithm]
     else:
-        todraw = [i for i in sortable.algorithms]
+        todraw = [i for i in algos.algorithms.keys()]
 
     if options.ofname and len(todraw) > 1:
         parser.error("Cannot specify output file name when drawing more than one algorithm.")
 
     for i in todraw:
-        a = i()
-        sortd = a(lst)
+        track = sortable.TrackList(lst)
+        sortd = algos.algorithms[i](track)
 
         if options.ofname:
             name = options.prefix + options.ofname
         else:
-            name = options.prefix + a.name + ".png"
+            name = options.prefix + i + ".png"
         if options.verbose:
             print name
 
         if options.printout:
-            print a.name
-            for i in sortd:
-                print i.path
+            print i
+            for j in sortd:
+                print j.path
 
         ldrawer.draw(
-            sortd,
-            a.name if options.title else None,
+            track,
+            i if options.title else None,
             name,
         )
 

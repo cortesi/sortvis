@@ -1,5 +1,5 @@
 import libpry
-from libsortvis import sortable
+from libsortvis import sortable, algos
 
 
 class uTrackList(libpry.AutoTree):
@@ -14,11 +14,12 @@ class uTrackList(libpry.AutoTree):
 
 class uAlgorithms(libpry.AutoTree):
     def test_all(self):
-        for i in sortable.algorithms:
+        for (k, v) in algos.algorithms.items():
             l = range(10)
             l.reverse()
-            a = i()(l)
-            if not [x.i for x in a] == range(10):
+            l = sortable.TrackList(l)
+            v(l)
+            if not [x.i for x in l] == range(10):
                 raise AssertionError("%s failed to sort."%i.name)
                 assert len(a[0].path) > 5
 

@@ -1,5 +1,5 @@
 import os.path
-from libsortvis import graph, sortable
+from libsortvis import graph, sortable, algos
 import libpry
 
 
@@ -36,8 +36,9 @@ class uWeave(_GraphTest):
         )
         l = range(10)
         l.reverse()
-        a = sortable.ListInsertion()(l)
-        p.draw(a, "test", os.path.join(OUTDIR, "test_grayscale.png"))
+        track = sortable.TrackList(l)
+        a = algos.insertionsort.insertionsort(track)
+        p.draw(track, "test", os.path.join(OUTDIR, "test_grayscale.png"))
 
 
 class uDense(_GraphTest):
@@ -46,8 +47,9 @@ class uDense(_GraphTest):
         p = graph.Dense(csource, 20, graph.rgb("ffffff"), graph.rgb("000000"), False)
         l = range(8)
         l.reverse()
-        a = sortable.ListInsertion()(l)
-        p.draw(a, "test", os.path.join(OUTDIR, "test_weave.png"))
+        track = sortable.TrackList(l)
+        a = algos.insertionsort.insertionsort(track)
+        p.draw(track, "test", os.path.join(OUTDIR, "test_weave.png"))
 
 
 class uUtils(libpry.AutoTree):
