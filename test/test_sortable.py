@@ -13,15 +13,17 @@ class uTrackList(libpry.AutoTree):
 
 
 class uAlgorithms(libpry.AutoTree):
+    # This value needs to be a power of 2, because bitonic sort requires it.
+    N = 2**5
     def test_all(self):
         for (k, v) in algos.algorithms.items():
-            l = range(10)
+            l = range(self.N)
             l.reverse()
             l = sortable.TrackList(l)
             v(l)
-            if not [x.i for x in l] == range(10):
-                raise AssertionError("%s failed to sort."%i.name)
-                assert len(a[0].path) > 5
+            if not [x.i for x in l] == range(self.N):
+                print l
+                raise AssertionError("%s failed to sort."%k)
 
 
 tests = [

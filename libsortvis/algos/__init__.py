@@ -6,6 +6,7 @@ def _algo(name):
     algorithms[name] = getattr(m, name)
 
 
+_algo("bitonicsort")
 _algo("bubblesort")
 _algo("cocktailsort")
 _algo("combsort")
