@@ -1,7 +1,5 @@
-import sys
 ASCENDING = True
 DESCENDING = False
-
 
 def compare(lst, i, j, dir):
     if dir == (lst[i] > lst[j]):
