@@ -1,12 +1,11 @@
 
 class Sortable:
-    comparisons = 0
-    def __init__(self, i):
-        self.i = i
+    def __init__(self, tracklist, i):
+        self.tracklist, self.i = tracklist, i
         self.path = []
 
     def __cmp__(self, other):
-        Sortable.comparisons += 1
+        self.tracklist.total_comparisons += 1
         return cmp(self.i, other.i)
 
     def __repr__(self):
@@ -19,8 +18,9 @@ class TrackList:
         the log() method is called.
     """
     def __init__(self, itms):
-        self.lst = [Sortable(i) for i in itms]
+        self.lst = [Sortable(self, i) for i in itms]
         self.start = self.lst[:]
+        self.total_comparisons = 0
         self.log()
 
     def wrap(self, wrapper):
@@ -28,7 +28,7 @@ class TrackList:
         self.start = self.lst[:]
 
     def reset(self):
-        Sortable.comparisons = 0
+        self.total_comparisons = 0
         self.lst = self.start[:]
 
     def __getattr__(self, attr):

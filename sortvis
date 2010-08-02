@@ -272,6 +272,7 @@ def main():
             i if options.title else None,
             name,
         )
+        print "\t%s comparisons"%(track.total_comparisons)
 
 
 if __name__ == "__main__":
