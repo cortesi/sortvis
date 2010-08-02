@@ -1,3 +1,4 @@
+import math
 ASCENDING = True
 DESCENDING = False
 
@@ -25,5 +26,7 @@ def _bitonicsort(lst, lo, n, dir):
 
 
 def bitonicsort(lst):
+    # Length of list must be 2**x, where x is an integer.
+    assert math.modf(math.log(len(lst), 2))[0] == 0
     _bitonicsort(lst, 0, len(lst), ASCENDING)
 

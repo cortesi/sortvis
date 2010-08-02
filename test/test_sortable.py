@@ -16,6 +16,12 @@ class uTrackList(libpry.AutoTree):
 class uAlgorithms(libpry.AutoTree):
     # This value needs to be a power of 2, because bitonic sort requires it.
     N = 2**5
+    def test_bitonicsort(self):
+        algos.bitonicsort.bitonicsort(sortable.TrackList(range(2**1)))
+        algos.bitonicsort.bitonicsort(sortable.TrackList(range(2**3)))
+        libpry.raises(AssertionError, algos.bitonicsort.bitonicsort, range(3))
+        libpry.raises(AssertionError, algos.bitonicsort.bitonicsort, range(9))
+
     def test_all(self):
         seqs = [
             range(self.N),
