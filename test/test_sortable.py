@@ -1,3 +1,4 @@
+import random
 import libpry
 from libsortvis import sortable, algos
 
@@ -16,14 +17,27 @@ class uAlgorithms(libpry.AutoTree):
     # This value needs to be a power of 2, because bitonic sort requires it.
     N = 2**5
     def test_all(self):
-        for (k, v) in algos.algorithms.items():
+        seqs = [
+            range(self.N),
+            list(reversed(range(self.N))),
+        ]
+
+        l = range(self.N)
+        l[0], l[-1] = l[-1], l[0]
+        seqs.append(l)
+
+        for i in range(5):
             l = range(self.N)
-            l.reverse()
-            l = sortable.TrackList(l)
-            v(l)
-            if not [x.i for x in l] == range(self.N):
-                print l
-                raise AssertionError("%s failed to sort."%k)
+            random.shuffle(l)
+            seqs.append(l)
+
+        for seq in seqs:
+            for (k, v) in algos.algorithms.items():
+                l = sortable.TrackList(seq)
+                v(l)
+                if not [x.i for x in l] == range(self.N):
+                    print l
+                    raise AssertionError("%s failed to sort."%k)
 
 
 tests = [
