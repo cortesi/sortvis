@@ -241,9 +241,6 @@ def main():
 
 
     if options.algorithm:
-        selected = [i.lower() for i in options.algorithm]
-
-    if options.algorithm:
         todraw = [i for i in algos.algorithms.keys() if i in options.algorithm]
     else:
         todraw = [i for i in algos.algorithms.keys()]
@@ -253,7 +250,7 @@ def main():
 
     for i in todraw:
         track = sortable.TrackList(lst)
-        sortd = algos.algorithms[i](track)
+        algos.algorithms[i](track)
 
         if options.ofname:
             name = options.prefix + options.ofname
@@ -264,7 +261,7 @@ def main():
 
         if options.printout:
             print i
-            for j in sortd:
+            for j in track:
                 print j.path
 
         ldrawer.draw(
