@@ -73,7 +73,7 @@ class TrackList(object):
     
     def addComparison(self,cmps,cmpo):
         spos,opos = None, None
-        if cmps.i == cmpo.i: print "stupid self comparison", cmps.i
+#        if cmps.i == cmpo.i: print "unnecessary self comparison", cmps.i
         for j,k in enumerate(self.lst):
             if k.i == cmps.i: spos = j
             if k.i == cmpo.i: opos = j
