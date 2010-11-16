@@ -7,7 +7,7 @@ def oddevensort(lst, nloops=2):
             for i in xrange(n, len(lst) - 1, nloops):
                 if lst[i] > lst[i + 1]:
                     lst[i], lst[i + 1] = lst[i + 1], lst[i]
-                    lst.log()
+#                    lst.log()
                     finished = False
 
 

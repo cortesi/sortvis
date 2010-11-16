@@ -13,5 +13,5 @@ def mergesort(lst, left=0, right=None):
             i += 1
             continue
         lst[i], lst[i+1:j+1] = lst[j], lst[i:j]
-        lst.log()
+#        lst.log()
         i, end_i, j = i + 1, end_i + 1, j + 1

@@ -1,4 +1,3 @@
-
 def quicksort(lst, left=0, right=None):
     if right is None:
         right = len(lst) - 1
@@ -13,8 +12,8 @@ def quicksort(lst, left=0, right=None):
                 r -= 1
             if l <= r:
                 lst[l], lst[r] = lst[r], lst[l]
-                if l != r:
-                    lst.log()
+#                if l != r:
+#                    lst.log()
                 l+=1
                 r-=1
         if left < r:

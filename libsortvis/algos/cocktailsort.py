@@ -7,7 +7,7 @@ def cocktailsort(lst):
         for i in xrange(begin, end):
             if lst[i] > lst[i + 1]:
                 lst[i], lst[i + 1] = lst[i + 1], lst[i]
-                lst.log()
+#                lst.log()
                 finished = False
         if finished:
             break
@@ -16,7 +16,7 @@ def cocktailsort(lst):
         for i in reversed(xrange(begin, end)):
             if lst[i] > lst[i + 1]:
                 lst[i], lst[i + 1] = lst[i + 1], lst[i]
-                lst.log()
+#                lst.log()
                 finished = False
         begin += 1
 

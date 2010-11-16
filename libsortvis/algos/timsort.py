@@ -1,38 +1,40 @@
+from ..sortable import Comparator
+class TimBreak(Exception):
+    def __init__(self, *args):
+        super(TimBreak, self).__init__(*args)
 
-class TimBreak(Exception): pass
-
-
-class TimWrapper:
-    list = None
+class TimComparator(Comparator):
     comparisons = 0
     limit = 0
-    def __init__(self, n):
-        self.n = n
+    def __init__(self, tracklist, i):
+        super(TimComparator, self).__init__(tracklist, i)
 
     def __cmp__(self, other):
-        if TimWrapper.comparisons > TimWrapper.limit:
-            raise TimBreak
-        TimWrapper.comparisons += 1
-        return cmp(self.n, other.n)
-
-    def __getattr__(self, attr):
-        return getattr(self.n, attr)
+        TimComparator.comparisons += 1
+        if TimComparator.comparisons > TimComparator.limit:
+            self.tracklist.total_comparisons += 1
+            raise TimBreak(self, other)
+        return cmp(self.i, other.i)
     
 
 def timsort(lst):
-    lst.wrap(TimWrapper)
-    TimWrapper.list = lst
-    prev = [i.n for i in lst]
+    # we need a hack in this one, as the TrackList.lst pointer to the list
+    # is set to [] while lst.sort() is running
+    # so what happens here is: we break each sort after limit comparisons,
+    # log the outcome, increase limit by 1 and run again from the beginning.
+    lst.setComparator(TimComparator, wrapOldOne=False)
+    TimComparator.list = lst
     while 1:
-        TimWrapper.comparisons = 0
-        TimWrapper.limit += 1
+        TimComparator.comparisons = 0
+        TimComparator.limit += 1
         lst.reset()
         try:
             lst.sort()
-        except TimBreak:
-            if prev != [i.n for i in lst]:
-                lst.log()
-                prev = [i.n for i in lst]
+        except TimBreak as t:
+            s,o = t
+            lst.addComparison(s,o)
+            lst.log()
         else:
             lst.log()
             break
+    

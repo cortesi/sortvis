@@ -6,7 +6,7 @@ def gnomesort(lst):
             i += 1
         else:
             lst[i], lst[i - 1] = lst[i - 1], lst[i]
-            lst.log()
+#            lst.log()
             i -= 1
 
 

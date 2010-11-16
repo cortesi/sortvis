@@ -11,7 +11,7 @@ def shellsort(lst):
                     flag = 1
                     lst[i+h], lst[i] = lst[i], lst[i+h]
                     i -= h
-                    lst.log()
+#                    lst.log()
                 else:
                     break
             lst[i+h] = r

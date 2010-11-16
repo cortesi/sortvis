@@ -5,7 +5,7 @@ DESCENDING = False
 def compare(lst, i, j, dir):
     if dir == (lst[i] > lst[j]):
         lst[i], lst[j] = lst[j], lst[i]
-        lst.log()
+#        lst.log()
 
 
 def merge(lst, lo, n, dir):

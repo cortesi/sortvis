@@ -19,11 +19,11 @@ def radixsort(lst):
             for j, item in enumerate(chain(zeroes, orig, ones)):
                 lst[j] = item
             # for a more simple graph, comment out the line below
-            lst.log()
+#            lst.log()
             #
             if is_sorted(lst):
                 return
-        lst.log()
+#        lst.log()
         shift = shift << 1
         zeroes[:] = []
         ones[:] = []

@@ -33,7 +33,7 @@ def sift(lst, pshift, head):
             lst[head], lst[rt] = lst[rt], lst[head]
             head = rt
             pshift -= 2
-        lst.log()
+#        lst.log()
 
 
 def trinkle(lst, p, pshift, head, trusty):
@@ -47,7 +47,7 @@ def trinkle(lst, p, pshift, head, trusty):
             if lst[rt] >= lst[stepson] or lst[lf] >= lst[stepson]:
                 break
         lst[head], lst[stepson] = lst[stepson], lst[head]
-        lst.log()
+#        lst.log()
         head = stepson
         trail = trailingzeroes(p & ~1)
         p >>= trail
