@@ -17,7 +17,7 @@ class Comparator(object):
         return cmp(self.i, other.i)
     
     def __repr__(self):
-        return str(self.i)
+        return repr(self.i)
 
 
 class TrackList(object):
