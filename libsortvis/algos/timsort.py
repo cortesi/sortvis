@@ -22,6 +22,8 @@ def timsort(lst):
     # is set to [] while lst.sort() is running
     # so what happens here is: we break each sort after limit comparisons,
     # log the outcome, increase limit by 1 and run again from the beginning.
+    TimComparator.comparisons = 0
+    TimComparator.limit = 0
     lst.setComparator(TimComparator, wrapOldOne=False)
     TimComparator.list = lst
     while 1:
