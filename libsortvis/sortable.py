@@ -6,7 +6,13 @@ class Sortable:
 
     def __cmp__(self, other):
         self.tracklist.total_comparisons += 1
-        return cmp(self.i, other.i)
+        try:
+            return cmp(self.i, other.i)
+        except AttributeError:
+            return cmp(self.i, other)
+
+    def __int__(self):
+        return self.i
 
     def __repr__(self):
         return str(self.i)
@@ -36,4 +42,5 @@ class TrackList:
     
     def log(self):
         for i, v in enumerate(self):
-            v.path.append(i)
+            if v is not None:
+                v.path.append(i)
