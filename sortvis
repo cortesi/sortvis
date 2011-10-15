@@ -17,6 +17,15 @@ def main():
         help="Draw only a named algorithm."
     )
     parser.add_option(
+        "-s",
+        dest="skip",
+        default=[],
+        type="choice",
+        action="append",
+        choices=algos.algorithms.keys(),
+        help="Skip a named algorithm. Can be passed multiple times."
+    )
+    parser.add_option(
         "-c",
         action="store", dest="csource",
         default="gradient", type="choice",
@@ -36,7 +45,12 @@ def main():
     parser.add_option(
         "-f",
         dest="readfile",
-        help="Read list of digits from file"
+        help="Read list of digits to sort from file"
+    )
+    parser.add_option(
+        "-F",
+        dest="readfile_sorthist",
+        help="Read an entire sorting history from file"
     )
     parser.add_option(
         "-o",
@@ -190,16 +204,25 @@ def main():
     else:
         parser.error("Unknown colour source: %s"%options.csource) 
 
-    if options.readfile:
-        txt = file(options.readfile).read().split()
-        lst = [int(i) for i in txt]
-    else:
-        lst = range(options.numelements)
-        random.shuffle(lst)
 
-    if options.dump:
-        for i in lst:
-            print i,
+    if options.readfile_sorthist:
+        if options.algorithm:
+            parser.error("Can't both specify algorithm and read a sort history from file.")
+        if not options.ofname:
+            parser.error("Must specify an output file when reading a sort history from file.")
+        f = file(options.readfile_sorthist)
+        lst = sortable.read_paths(f)
+    else:
+        if options.readfile:
+            txt = file(options.readfile).read().split()
+            lst = [int(i) for i in txt]
+        else:
+            lst = range(options.numelements)
+            random.shuffle(lst)
+
+        if options.dump:
+            for i in lst:
+                print i,
 
     try:
         background = graph.rgb(options.background)
@@ -239,37 +262,43 @@ def main():
     else:
         parser.error("Unknown visualisation: %s"%args[0])
 
-
-    if options.algorithm:
-        todraw = [i for i in algos.algorithms.keys() if i in options.algorithm]
-    else:
-        todraw = [i for i in algos.algorithms.keys()]
-
-    if options.ofname and len(todraw) > 1:
-        parser.error("Cannot specify output file name when drawing more than one algorithm.")
-
-    for i in todraw:
-        track = sortable.TrackList(lst)
-        algos.algorithms[i](track)
-
-        if options.ofname:
-            name = options.prefix + options.ofname
-        else:
-            name = options.prefix + i + ".png"
-        if options.verbose:
-            print name
-
-        if options.printout:
-            print i
-            for j in track:
-                print j.path
-
+    if options.readfile_sorthist:
         ldrawer.draw(
-            track,
+            lst,
             i if options.title else None,
-            name,
+            options.ofname,
         )
-        print "\t%s comparisons"%(track.total_comparisons)
+    else:
+        if options.algorithm:
+            todraw = [i for i in algos.algorithms.keys() if i in options.algorithm]
+        else:
+            todraw = [i for i in algos.algorithms.keys() if i not in options.skip]
+
+        if options.ofname and len(todraw) > 1:
+            parser.error("Cannot specify output file name when drawing more than one algorithm.")
+
+        for i in todraw:
+            track = sortable.TrackList(lst)
+            algos.algorithms[i](track)
+
+            if options.ofname:
+                name = options.prefix + options.ofname
+            else:
+                name = options.prefix + i + ".png"
+            if options.verbose:
+                print name
+
+            if options.printout:
+                print i
+                for j in track:
+                    print j.path
+
+            ldrawer.draw(
+                track,
+                i if options.title else None,
+                name,
+            )
+            print "\t%s comparisons"%(track.total_comparisons)
 
 
 if __name__ == "__main__":

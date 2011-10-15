@@ -50,3 +50,33 @@ class TrackList:
         for i, v in enumerate(self):
             if v is not None:
                 v.path.append(i)
+
+
+class DummySortable(object):
+    def __init__(self, i):
+        self.i = i
+        self.path = []
+
+    def __int__(self):
+        return self.i
+
+
+
+def read_paths(fp):
+    """
+        Reads a sorting history from a filepointer, and returns a list of Sortables.
+
+        The sorting history is specified as a set of newline-terminated lists,
+        with each list consisting of space-separated numbers.
+    """
+    sortables = {}
+    for i in fp.readlines():
+        n = i.split()
+        if not sortables:
+            for j in n:
+                j = int(j)
+                sortables[j] = DummySortable(j)
+        for offset, j in enumerate(n):
+            sortables[int(j)].path.append(offset)
+    return sortables.values()
+

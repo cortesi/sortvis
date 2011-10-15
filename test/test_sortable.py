@@ -1,5 +1,6 @@
 import random
 import libpry
+import cStringIO
 from libsortvis import sortable, algos
 
 
@@ -46,8 +47,25 @@ class uAlgorithms(libpry.AutoTree):
                     raise AssertionError("%s failed to sort."%k)
 
 
+class uReadPaths(libpry.AutoTree):
+    def test_read_paths(self):
+        s = cStringIO.StringIO(
+            "1 2 3\n"
+            "2 1 3\n"
+        )
+        r = sortable.read_paths(s)
+        for i in r:
+            if i.i == 1:
+                assert i.path == [0, 1]
+            elif i.i == 2:
+                assert i.path == [1, 0]
+            elif i.i == 3:
+                assert i.path == [2, 2]
+
+
 tests = [
     uTrackList(),
     uAlgorithms(),
+    uReadPaths()
 ]
 
