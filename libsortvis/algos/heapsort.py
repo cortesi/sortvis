@@ -13,7 +13,7 @@ def sift(lst, start, count):
             return
 
 def heapsort(lst):
-    start = (len(lst)/2)-1
+    start = (len(lst)//2)-1
     end = len(lst)-1
     while start >= 0:
         sift(lst, start, len(lst))

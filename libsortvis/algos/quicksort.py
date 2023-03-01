@@ -5,7 +5,7 @@ def quicksort(lst, left=0, right=None):
     l = left
     r = right
     if l <= r:
-        mid = lst[(left+right)/2]
+        mid = lst[(left+right)//2]
         while l <= r:
             while l <= right and lst[l] < mid:
                 l += 1

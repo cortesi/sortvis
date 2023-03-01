@@ -13,7 +13,7 @@ def main():
         default=[],
         type="choice",
         action="append",
-        choices=algos.algorithms.keys(),
+        choices=list(algos.algorithms.keys()),
         help="Draw only a named algorithm."
     )
     parser.add_option(
@@ -22,7 +22,7 @@ def main():
         default=[],
         type="choice",
         action="append",
-        choices=algos.algorithms.keys(),
+        choices=list(algos.algorithms.keys()),
         help="Skip a named algorithm. Can be passed multiple times."
     )
     parser.add_option(
@@ -192,11 +192,11 @@ def main():
     if options.csource == "gradient":
         try:
             gstart = graph.rgb(options.gradient_start)
-        except ValueError, v:
+        except ValueError as v:
             parser.error("Invalid gradient start - " + str(v))
         try:
             gend = graph.rgb(options.gradient_end)
-        except ValueError, v:
+        except ValueError as v:
             parser.error("Invalid gradient end - " + str(v))
         csource = graph.ColourGradient(gstart, gend)
     elif options.csource == "hilbert":
@@ -210,28 +210,28 @@ def main():
             parser.error("Can't both specify algorithm and read a sort history from file.")
         if not options.ofname:
             parser.error("Must specify an output file when reading a sort history from file.")
-        f = file(options.readfile_sorthist)
+        f = open(options.readfile_sorthist)
         lst = sortable.read_paths(f)
     else:
         if options.readfile:
-            txt = file(options.readfile).read().split()
+            txt = open(options.readfile).read().split()
             lst = [int(i) for i in txt]
         else:
-            lst = range(options.numelements)
+            lst = list(range(options.numelements))
             random.shuffle(lst)
 
         if options.dump:
             for i in lst:
-                print i,
+                print(i, end=' ')
 
     try:
         background = graph.rgb(options.background)
-    except ValueError, v:
+    except ValueError as v:
         parser.error("Invalid background - " + str(v))
 
     try:
         titlecolour = graph.rgb(options.titlecolour)
-    except ValueError, v:
+    except ValueError as v:
         parser.error("Invalid title colour - " + str(v))
 
     if args[0] == "weave":
@@ -286,19 +286,19 @@ def main():
             else:
                 name = options.prefix + i + ".png"
             if options.verbose:
-                print name
+                print(name)
 
             if options.printout:
-                print i
+                print(i)
                 for j in track:
-                    print j.path
+                    print(j.path)
 
             ldrawer.draw(
                 track,
                 i if options.title else None,
                 name,
             )
-            print "\t%s comparisons"%(track.total_comparisons)
+            print("\t%s comparisons"%(track.total_comparisons))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,10 @@
+from functools import total_ordering
+
 
 class TimBreak(Exception): pass
 
 
+@total_ordering
 class TimWrapper:
     list = None
     comparisons = 0
@@ -9,11 +12,17 @@ class TimWrapper:
     def __init__(self, n):
         self.n = n
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if TimWrapper.comparisons > TimWrapper.limit:
             raise TimBreak
         TimWrapper.comparisons += 1
-        return cmp(self.n, other.n)
+        return self.n == other.n
+
+    def __lt__(self, other):
+        if TimWrapper.comparisons > TimWrapper.limit:
+            raise TimBreak
+        TimWrapper.comparisons += 1
+        return self.n < other.n
 
     def __getattr__(self, attr):
         return getattr(self.n, attr)

@@ -5,8 +5,8 @@ def radixsort(lst):
     shift = 1
     zeroes = []
     ones = []
-    while not is_sorted(lst.lst):
-        orig = lst.lst[:]
+    while not is_sorted(lst):
+        orig = lst[:]
         while len(orig) != 0:
             # take an item out of the list
             item = orig.pop(0)

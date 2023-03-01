@@ -16,7 +16,7 @@ MultiplyDeBruijnBitPosition = [ 0,  1, 28,  2, 29, 14, 24, 3,
                                 26, 12, 18,  6, 11,  5, 10, 9]
 
 def trailingzeroes(v):
-    return MultiplyDeBruijnBitPosition[(((v & -v) * 0x077CB531L) >> 27) & 0b11111]
+    return MultiplyDeBruijnBitPosition[(((v & -v) * 0x077CB531) >> 27) & 0b11111]
 
 
 def sift(lst, pshift, head):
