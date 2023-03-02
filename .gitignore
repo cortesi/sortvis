@@ -10,3 +10,4 @@ MANIFEST
 *.swp
 /doc
 /tmp
+/docs/_site
