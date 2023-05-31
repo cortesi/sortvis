@@ -1,3 +1,7 @@
+# radixsort
+![detail](images/weave-radixsort.png)
+## code
+```python
 from itertools import chain
 
 def radixsort(lst):
@@ -27,3 +31,6 @@ def radixsort(lst):
         shift = shift << 1
         zeroes[:] = []
         ones[:] = []
+```
+
+List order is sampled for visualisation whenever `lst.log()` is called.

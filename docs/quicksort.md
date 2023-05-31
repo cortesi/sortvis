@@ -1,4 +1,7 @@
-
+# quicksort
+![detail](images/weave-quicksort.png)
+## code
+```python
 def quicksort(lst, left=0, right=None):
     if right is None:
         right = len(lst) - 1
@@ -21,4 +24,6 @@ def quicksort(lst, left=0, right=None):
             quicksort(lst, left, r)
         if l < right:
             quicksort(lst, l, right)
+```
 
+List order is sampled for visualisation whenever `lst.log()` is called.

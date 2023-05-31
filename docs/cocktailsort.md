@@ -1,4 +1,7 @@
-
+# cocktailsort
+![detail](images/weave-cocktailsort.png)
+## code
+```python
 def cocktailsort(lst):
     begin, end = 0, len(lst) - 1
     finished = False
@@ -19,4 +22,6 @@ def cocktailsort(lst):
                 lst.log()
                 finished = False
         begin += 1
+```
 
+List order is sampled for visualisation whenever `lst.log()` is called.

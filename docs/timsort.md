@@ -1,3 +1,7 @@
+# timsort
+![detail](images/weave-timsort.png)
+## code
+```python
 from functools import total_ordering
 
 
@@ -45,3 +49,6 @@ def timsort(lst):
         else:
             lst.log()
             break
+```
+
+List order is sampled for visualisation whenever `lst.log()` is called.

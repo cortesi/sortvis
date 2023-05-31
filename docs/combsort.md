@@ -1,4 +1,7 @@
-
+# combsort
+![detail](images/weave-combsort.png)
+## code
+```python
 def combsort(lst):
     gap = len(lst)
     swaps = False
@@ -12,4 +15,6 @@ def combsort(lst):
                 swaps = True
         if not swaps and gap <= 1:
             break
+```
 
+List order is sampled for visualisation whenever `lst.log()` is called.

@@ -1,4 +1,7 @@
-
+# smoothsort
+![detail](images/weave-smoothsort.png)
+## code
+```python
 # Possibly replace with a generator that produces Leonardo numbers?
 # That would be of limited utility since this is all of them up to 31 bits.
 LP = [ 1, 1, 3, 5, 9, 15, 25, 41, 67, 109, 177, 287, 465, 753, 1219, 1973,
@@ -96,3 +99,6 @@ def smoothsort(lst):
             trinkle(lst, p >> 1, pshift + 1, head - LP[pshift] - 1, True)
             trinkle(lst, p, pshift, head - 1, True)
         head -= 1
+```
+
+List order is sampled for visualisation whenever `lst.log()` is called.

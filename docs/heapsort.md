@@ -1,4 +1,7 @@
-
+# heapsort
+![detail](images/weave-heapsort.png)
+## code
+```python
 def sift(lst, start, count):
     root = start
     while (root * 2) + 1 < count:
@@ -23,3 +26,6 @@ def heapsort(lst):
         lst.log()
         sift(lst, 0, end)
         end -= 1
+```
+
+List order is sampled for visualisation whenever `lst.log()` is called.

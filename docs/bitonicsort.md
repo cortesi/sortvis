@@ -1,3 +1,7 @@
+# bitonicsort
+![detail](images/weave-bitonicsort.png)
+## code
+```python
 import math
 ASCENDING = True
 DESCENDING = False
@@ -29,4 +33,6 @@ def bitonicsort(lst):
     # Length of list must be 2**x, where x is an integer.
     assert math.modf(math.log(len(lst), 2))[0] == 0
     _bitonicsort(lst, 0, len(lst), ASCENDING)
+```
 
+List order is sampled for visualisation whenever `lst.log()` is called.
